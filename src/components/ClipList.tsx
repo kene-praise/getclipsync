@@ -1,3 +1,4 @@
+import { useEffect } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
@@ -23,6 +24,36 @@ const ClipList = () => {
     },
     enabled: !!user,
   });
+
+  useEffect(() => {
+    if (!user) return;
+
+    const channel = supabase
+      .channel(`realtime-clips:${user.id}`)
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'clips',
+          filter: `user_id=eq.${user.id}`,
+        },
+        (payload) => {
+          console.log('Realtime event:', payload);
+          if (payload.eventType === 'INSERT') {
+            toast.info("New clip received!");
+          } else if (payload.eventType === 'DELETE') {
+            toast.info("A clip was deleted on another device.");
+          }
+          queryClient.invalidateQueries({ queryKey: ['clips', user.id] });
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [user, queryClient]);
 
   const deleteMutation = useMutation({
     mutationFn: async (clipId: string) => {
