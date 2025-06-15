@@ -1,4 +1,3 @@
-
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
@@ -55,6 +54,29 @@ const ClipList = () => {
     toast.success("Text copied to clipboard!");
   }
 
+  const handleDownload = async (filePath: string, fileName: string) => {
+    try {
+      const { data, error } = await supabase.storage
+        .from('clip_files')
+        .createSignedUrl(filePath, 60); // The link will be valid for 60 seconds
+
+      if (error) throw error;
+
+      // This creates a temporary link and clicks it to trigger the download
+      const link = document.createElement('a');
+      link.href = data.signedUrl;
+      link.download = fileName;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      toast.success("Your download has started!");
+
+    } catch (error: any) {
+      console.error('Error downloading file:', error);
+      toast.error(error.message || 'Failed to download file.');
+    }
+  };
+
   if (isLoading) {
     return (
       <div className="flex justify-center items-center py-10">
@@ -102,12 +124,10 @@ const ClipList = () => {
                   <Clipboard className="h-5 w-5" />
                 </Button>
               )}
-              {clip.content_type === 'file' && (
-                 <a href={supabase.storage.from('clip_files').getPublicUrl(clip.file_path!).data.publicUrl} download={clip.file_name!} title="Download file">
-                  <Button variant="ghost" size="icon">
-                    <Download className="h-5 w-5" />
-                  </Button>
-                </a>
+              {clip.content_type === 'file' && clip.file_path && clip.file_name && (
+                <Button variant="ghost" size="icon" onClick={() => handleDownload(clip.file_path!, clip.file_name!)} title="Download file">
+                  <Download className="h-5 w-5" />
+                </Button>
               )}
               <Button
                 variant="ghost"
