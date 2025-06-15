@@ -4,9 +4,10 @@ import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Loader2, AlertTriangle, FileText, Download } from 'lucide-react';
+import { Loader2, AlertTriangle, FileText, Download, Copy } from 'lucide-react';
 import SiteHeader from '@/components/SiteHeader';
 import Footer from '@/components/Footer';
+import { toast } from 'sonner';
 
 const fetchTemporaryClip = async (code: string) => {
     const { data, error } = await supabase
@@ -27,6 +28,19 @@ const SharePage = () => {
         queryFn: () => fetchTemporaryClip(code!),
         enabled: !!code,
     });
+
+    const handleCopyText = () => {
+        if (clip?.text_content) {
+            navigator.clipboard.writeText(clip.text_content)
+                .then(() => {
+                    toast.success("Text copied to clipboard!");
+                })
+                .catch(err => {
+                    console.error('Failed to copy text: ', err);
+                    toast.error("Failed to copy text.");
+                });
+        }
+    };
 
     const renderContent = () => {
         if (isLoading) {
@@ -63,7 +77,13 @@ const SharePage = () => {
             <div className="space-y-4 w-full">
                 {clip.text_content && (
                     <div className="space-y-2">
-                        <h3 className="font-semibold">Text Content</h3>
+                        <div className="flex items-center justify-between">
+                            <h3 className="font-semibold">Text Content</h3>
+                            <Button variant="ghost" size="sm" onClick={handleCopyText}>
+                                <Copy className="mr-2 h-4 w-4" />
+                                Copy
+                            </Button>
+                        </div>
                         <pre className="p-4 bg-muted rounded-md text-sm whitespace-pre-wrap font-sans">{clip.text_content}</pre>
                     </div>
                 )}
