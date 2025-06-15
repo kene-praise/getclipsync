@@ -28,23 +28,30 @@ const QuickShareForm = () => {
 
   useEffect(() => {
     const pasteFromClipboard = async () => {
-      // Only paste if there's no text and no file yet.
-      if (textContent.trim() === '' && !file) {
+      // Only paste if there's no text and no file, and the window is focused.
+      if (document.hasFocus() && textContent.trim() === '' && !file) {
         try {
           const text = await navigator.clipboard.readText();
-          if (text) {
+          if (text && text.trim() !== '') {
             setTextContent(text);
             toast.info("Pasted from clipboard");
           }
         } catch (err) {
           // Fail silently if clipboard permission is not granted.
-          console.info("Could not read from clipboard on load.");
+          console.info("Could not read from clipboard on load/focus.", err);
         }
       }
     };
+    
+    // Run on initial mount
     pasteFromClipboard();
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []); // Run only on mount
+    // And on window focus
+    window.addEventListener('focus', pasteFromClipboard);
+
+    return () => {
+      window.removeEventListener('focus', pasteFromClipboard);
+    };
+  }, [textContent, file]); // Dependencies ensure the handler has fresh state
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
