@@ -9,7 +9,7 @@
   :root {
     --background: 240 10% 3.9%;
     --foreground: 0 0% 98%;
-    --glow: 220 80% 60%; /* Soft blue for gradient */
+    --glow: 220 95% 65%; /* Soft blue for gradient */
     --card: 240 10% 3.9%;
     --card-foreground: 0 0% 98%;
     --popover: 240 10% 3.9%;
