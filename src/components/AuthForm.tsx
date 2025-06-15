@@ -1,5 +1,4 @@
-
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -10,13 +9,18 @@ import { Loader2, Eye, EyeOff } from 'lucide-react';
 import { useLocation, useNavigate } from 'react-router-dom';
 
 const AuthForm = () => {
-  const [isSignUp, setIsSignUp] = useState(false);
+  const location = useLocation();
+  const initialIsSignUp = location.state?.isSignUp === true;
+  const [isSignUp, setIsSignUp] = useState(initialIsSignUp);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
-  const location = useLocation();
+
+  useEffect(() => {
+    setIsSignUp(location.state?.isSignUp === true);
+  }, [location.state]);
 
   const handleAuth = async () => {
     setIsLoading(true);
@@ -26,7 +30,7 @@ const AuthForm = () => {
         email,
         password,
         options: {
-          emailRedirectTo: `${window.location.origin}/`,
+          emailRedirectTo: `${window.location.origin}/app`,
         },
       });
 
@@ -46,7 +50,7 @@ const AuthForm = () => {
         toast.error(error.message);
       } else {
         toast.success('Successfully logged in!');
-        const from = location.state?.from?.pathname || '/';
+        const from = location.state?.from?.pathname || '/app';
         navigate(from, { replace: true });
       }
     }

@@ -60,6 +60,39 @@ export type Database = {
         }
         Relationships: []
       }
+      temporary_clips: {
+        Row: {
+          code: string
+          content_type: string
+          created_at: string
+          expires_at: string
+          file_name: string | null
+          file_url: string | null
+          id: string
+          text_content: string | null
+        }
+        Insert: {
+          code: string
+          content_type: string
+          created_at?: string
+          expires_at?: string
+          file_name?: string | null
+          file_url?: string | null
+          id?: string
+          text_content?: string | null
+        }
+        Update: {
+          code?: string
+          content_type?: string
+          created_at?: string
+          expires_at?: string
+          file_name?: string | null
+          file_url?: string | null
+          id?: string
+          text_content?: string | null
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
