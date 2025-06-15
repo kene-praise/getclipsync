@@ -1,3 +1,4 @@
+
 import { useState } from 'react';
 import { Textarea } from '@/components/ui/textarea';
 import { Button } from '@/components/ui/button';
@@ -6,7 +7,7 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/com
 import { Upload, Link, Loader2, Copy } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
-import QRCode from 'qrcode.react';
+import { QRCodeSVG as QRCode } from 'qrcode.react';
 
 const SendForm = () => {
   const [text, setText] = useState('');
@@ -168,9 +169,11 @@ const SendForm = () => {
           {isLoading ? (
             <Loader2 className="mr-2 h-4 w-4 animate-spin" />
           ) : (
-            <Link className="mr-2 h-4 w-4" />
+            <>
+              <Link className="mr-2 h-4 w-4" />
+              Generate Code
+            </>
           )}
-          Generate Code
         </Button>
       </CardContent>
     </Card>
