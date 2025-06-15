@@ -1,3 +1,4 @@
+
 import { useState } from 'react';
 import SiteHeader from '@/components/SiteHeader';
 import Footer from '@/components/Footer';
@@ -113,10 +114,10 @@ const LandingPage = () => {
                     </Card>
                     <Card>
                         <CardHeader>
-                            <CardTitle className="flex items-center gap-2"><CheckCircle className="text-primary h-5 w-5" /> No Expiration</CardTitle>
+                            <CardTitle className="flex items-center gap-2"><CheckCircle className="text-primary h-5 w-5" /> Longer Retention</CardTitle>
                         </CardHeader>
                         <CardContent>
-                            <p className="text-muted-foreground">Your synced items are saved to your account and never expire.</p>
+                            <p className="text-muted-foreground">Your clips are saved for 30 days, much longer than the 1 hour for quick shares.</p>
                         </CardContent>
                     </Card>
                 </div>

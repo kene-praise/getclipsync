@@ -115,7 +115,7 @@ const SharePage = () => {
                 <Card className="w-full max-w-2xl animate-fade-in">
                     <CardHeader>
                         <CardTitle>Shared Clip</CardTitle>
-                        <CardDescription>This clip was shared via ClipSync. It expires 24 hours after creation.</CardDescription>
+                        <CardDescription>This clip was shared via ClipSync. It expires 1 hour after creation.</CardDescription>
                     </CardHeader>
                     <CardContent>
                         {renderContent()}
