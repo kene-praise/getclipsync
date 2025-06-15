@@ -1,4 +1,5 @@
-import { useState } from 'react';
+
+import { useState, useEffect } from 'react';
 import { Textarea } from '@/components/ui/textarea';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -14,6 +15,37 @@ const CreateClipForm = () => {
   const [file, setFile] = useState<File | null>(null);
   const { user } = useAuth();
   const queryClient = useQueryClient();
+
+  useEffect(() => {
+    const handleWindowFocus = async () => {
+      if (!document.hasFocus()) return;
+
+      try {
+        const clipboardText = await navigator.clipboard.readText();
+        if (clipboardText && clipboardText.trim() !== '') {
+          setText(currentText => {
+            if (clipboardText.trim() !== currentText.trim()) {
+              setFile(null);
+              toast.info("Pasted from clipboard.");
+              return clipboardText;
+            }
+            return currentText;
+          });
+        }
+      } catch (error) {
+        // Fail silently if clipboard access is denied or not supported.
+        console.log('Clipboard read access denied or not available.');
+      }
+    };
+
+    window.addEventListener('focus', handleWindowFocus);
+    // Check on initial load as well
+    handleWindowFocus();
+
+    return () => {
+      window.removeEventListener('focus', handleWindowFocus);
+    };
+  }, []);
 
   const createClipMutation = useMutation({
     mutationFn: async ({ text, file }: { text: string; file: File | null }) => {
