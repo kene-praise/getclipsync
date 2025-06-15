@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from 'react';
 import { useMutation } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
@@ -157,12 +158,13 @@ const QuickShareForm = () => {
                     onChange={(e) => setTextContent(e.target.value)}
                     rows={4}
                     disabled={mutation.isPending}
+                    className="bg-input/70 placeholder:text-muted-foreground/80 focus:bg-input/80 transition-colors"
                 />
                  {file ? (
                     <AttachedFilePreview file={file} onClearFile={clearFile} isPending={mutation.isPending} />
                 ) : (
                     <div className="relative">
-                        <Button type="button" variant="outline" className="w-full" disabled={mutation.isPending}>
+                        <Button type="button" variant="outline" className="w-full bg-input/70 hover:bg-input/80 transition-colors" disabled={mutation.isPending}>
                             <FileUp className="mr-2 h-4 w-4" />
                             Attach a file (max 5MB)
                         </Button>
