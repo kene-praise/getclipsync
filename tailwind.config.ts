@@ -23,6 +23,7 @@ export default {
         sans: ['Inter', 'sans-serif'],
       },
 			colors: {
+				glow: 'hsl(var(--glow))',
 				border: 'hsl(var(--border))',
 				input: 'hsl(var(--input))',
 				ring: 'hsl(var(--ring))',

@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { useMutation } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
@@ -117,7 +116,7 @@ const QuickShareForm = () => {
 
   if (sharedClip) {
     return (
-        <Card className="animate-fade-in">
+        <Card className="animate-fade-in bg-secondary/20 backdrop-blur-md border border-white/10">
             <CardHeader className="text-center">
                 <CardTitle>Share This Clip!</CardTitle>
                 <CardDescription>Share this code or link. It will expire in 24 hours.</CardDescription>
@@ -145,7 +144,7 @@ const QuickShareForm = () => {
   }
 
   return (
-    <Card>
+    <Card className="bg-secondary/20 backdrop-blur-md border border-white/10">
         <CardHeader>
             <CardTitle>Quick Share</CardTitle>
             <CardDescription>Share text or a file instantly. No account needed.</CardDescription>
