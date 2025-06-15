@@ -1,3 +1,4 @@
+
 import { useState, useEffect, useCallback } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
@@ -100,6 +101,12 @@ const ReceiveForm = ({ initialCode }: ReceiveFormProps) => {
       fetchClip(initialCode);
     }
   }, [initialCode, fetchClip]);
+
+  useEffect(() => {
+    if (code.length === 6 && !isLoading && !receivedData) {
+      fetchClip(code);
+    }
+  }, [code, fetchClip, isLoading, receivedData]);
   
   const handleReset = () => {
     setCode('');
@@ -156,7 +163,9 @@ const ReceiveForm = ({ initialCode }: ReceiveFormProps) => {
       <CardHeader>
         <CardTitle>Receive a Clip</CardTitle>
         <CardDescription>
-          Enter the 6-digit code from your other device.
+          {isLoading
+            ? 'Verifying code and fetching your clip...'
+            : 'Enter the 6-digit code from your other device.'}
         </CardDescription>
       </CardHeader>
       <CardContent className="flex flex-col items-center gap-4">
