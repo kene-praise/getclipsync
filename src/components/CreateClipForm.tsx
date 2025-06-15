@@ -1,3 +1,4 @@
+
 import { useState, useEffect, useRef } from 'react';
 import { Textarea } from '@/components/ui/textarea';
 import { Button } from '@/components/ui/button';
@@ -17,41 +18,6 @@ const CreateClipForm = () => {
   const { user } = useAuth();
   const queryClient = useQueryClient();
   const fileInputRef = useRef<HTMLInputElement>(null);
-
-  useEffect(() => {
-    const handleWindowFocus = async () => {
-      if (!document.hasFocus() || !autoSyncOnFocus) return;
-
-      try {
-        const clipboardText = await navigator.clipboard.readText();
-        if (clipboardText && clipboardText.trim() !== '') {
-          // Only auto-sync if form is empty to avoid overwriting user input
-          if (text.trim() === '' && file === null) {
-            const clips = queryClient.getQueryData<any[]>(['clips', user?.id]);
-            const latestClipText = clips?.[0]?.text_content;
-
-            if (latestClipText?.trim() !== clipboardText.trim()) {
-              createClipMutation.mutate({ text: clipboardText, file: null }, {
-                onSuccess: () => {
-                  toast.info("Auto-synced from clipboard.");
-                  queryClient.invalidateQueries({ queryKey: ['clips', user?.id] });
-                }
-              });
-            }
-          }
-        }
-      } catch (error) {
-        // Fail silently if clipboard access is denied or not available.
-        console.log('Clipboard read access denied or not available.');
-      }
-    };
-
-    window.addEventListener('focus', handleWindowFocus);
-
-    return () => {
-      window.removeEventListener('focus', handleWindowFocus);
-    };
-  }, [autoSyncOnFocus, text, file, user?.id, queryClient, createClipMutation]);
 
   const createClipMutation = useMutation({
     mutationFn: async ({ text, file }: { text: string; file: File | null }) => {
@@ -92,6 +58,41 @@ const CreateClipForm = () => {
       toast.error(error.message || 'Failed to sync clip. Please try again.');
     }
   });
+
+  useEffect(() => {
+    const handleWindowFocus = async () => {
+      if (!document.hasFocus() || !autoSyncOnFocus) return;
+
+      try {
+        const clipboardText = await navigator.clipboard.readText();
+        if (clipboardText && clipboardText.trim() !== '') {
+          // Only auto-sync if form is empty to avoid overwriting user input
+          if (text.trim() === '' && file === null) {
+            const clips = queryClient.getQueryData<any[]>(['clips', user?.id]);
+            const latestClipText = clips?.[0]?.text_content;
+
+            if (latestClipText?.trim() !== clipboardText.trim()) {
+              createClipMutation.mutate({ text: clipboardText, file: null }, {
+                onSuccess: () => {
+                  toast.info("Auto-synced from clipboard.");
+                  queryClient.invalidateQueries({ queryKey: ['clips', user?.id] });
+                }
+              });
+            }
+          }
+        }
+      } catch (error) {
+        // Fail silently if clipboard access is denied or not available.
+        console.log('Clipboard read access denied or not available.');
+      }
+    };
+
+    window.addEventListener('focus', handleWindowFocus);
+
+    return () => {
+      window.removeEventListener('focus', handleWindowFocus);
+    };
+  }, [autoSyncOnFocus, text, file, user?.id, queryClient, createClipMutation]);
 
   const handleSend = () => {
     createClipMutation.mutate({ text, file }, {
