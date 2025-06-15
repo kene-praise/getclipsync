@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
@@ -8,6 +7,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { toast } from 'sonner';
 import { Loader2, Eye, EyeOff } from 'lucide-react';
 import { useLocation, useNavigate } from 'react-router-dom';
+import GoogleIcon from './icons/GoogleIcon';
 
 const AuthForm = () => {
   const location = useLocation();
@@ -23,22 +23,40 @@ const AuthForm = () => {
     setIsSignUp(location.state?.isSignUp === true);
   }, [location.state]);
 
+  const handleOAuthSignIn = async (provider: 'google') => {
+    setIsLoading(true);
+    const { error } = await supabase.auth.signInWithOAuth({
+      provider,
+      options: {
+        redirectTo: `${window.location.origin}/app`,
+      },
+    });
+    if (error) {
+      toast.error(error.message);
+      setIsLoading(false);
+    }
+    // On success, Supabase handles the redirect.
+  };
+
   const handleAuth = async () => {
     setIsLoading(true);
     
     if (isSignUp) {
-      const { error } = await supabase.auth.signUp({
+      const { data, error } = await supabase.auth.signUp({
         email,
         password,
-        options: {
-          emailRedirectTo: `${window.location.origin}/app`,
-        },
       });
 
       if (error) {
         toast.error(error.message);
-      } else {
-        toast.success('Check your email for a confirmation link!');
+      } else if (data.session) {
+        // If email confirmation is disabled, a session is returned.
+        toast.success('Account created successfully!');
+        const from = location.state?.from?.pathname || '/app';
+        navigate(from, { replace: true });
+      } else if (data.user) {
+        // If email confirmation is enabled, user needs to verify.
+        toast.info('Please check your email to confirm your account.');
         clearForm();
       }
     } else {
@@ -74,11 +92,27 @@ const AuthForm = () => {
         <CardTitle>{isSignUp ? 'Create an Account' : 'Sign In'}</CardTitle>
         <CardDescription>
           {isSignUp 
-            ? 'Enter your email and password to create an account.' 
+            ? 'Enter your details below to create an account.' 
             : 'Welcome back! Sign in to access your clips.'}
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">
+        <Button variant="outline" className="w-full" onClick={() => handleOAuthSignIn('google')} disabled={isLoading}>
+          <GoogleIcon className="mr-2 h-4 w-4" />
+          {isSignUp ? 'Sign Up with Google' : 'Sign In with Google'}
+        </Button>
+
+        <div className="relative">
+          <div className="absolute inset-0 flex items-center">
+            <span className="w-full border-t" />
+          </div>
+          <div className="relative flex justify-center text-xs uppercase">
+            <span className="bg-card px-2 text-muted-foreground">
+              Or with email
+            </span>
+          </div>
+        </div>
+        
         <div className="space-y-2">
           <Label htmlFor="email">Email</Label>
           <Input id="email" type="email" placeholder="m@example.com" required value={email} onChange={(e) => setEmail(e.target.value)} />
