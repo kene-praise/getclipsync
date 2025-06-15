@@ -15,13 +15,13 @@ const LandingPage = () => {
           
           <div className="relative z-10 container mx-auto px-4">
             <div className="max-w-3xl mx-auto">
-              <h1 className="text-4xl md:text-5xl font-bold tracking-tight">Seamlessly Sync Your Clipboard</h1>
+              <h1 className="text-4xl md:text-5xl font-bold tracking-tight">Seamlessly sync<br />your clipboard</h1>
               <p className="mt-4 text-lg text-muted-foreground max-w-2xl mx-auto">
                 Instantly share text, links, or files between devices with a simple code. No account needed for a quick share.
               </p>
             </div>
             
-            <div className="mt-12 max-w-2xl mx-auto">
+            <div className="mt-12 max-w-lg mx-auto">
               <QuickShareForm />
             </div>
           </div>
