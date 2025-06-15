@@ -1,0 +1,47 @@
+
+import React from 'react';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Paperclip, Zap, Loader2 } from 'lucide-react';
+
+interface ClipFormActionsProps {
+  onSend: () => void;
+  onFileChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  isPending: boolean;
+  hasContent: boolean;
+  fileInputRef: React.RefObject<HTMLInputElement>;
+}
+
+const ClipFormActions: React.FC<ClipFormActionsProps> = ({ onSend, onFileChange, isPending, hasContent, fileInputRef }) => {
+  return (
+    <div className="flex items-center justify-between border-t border-input bg-muted/30 p-2 px-3">
+      <div>
+        <Input
+          id="file-upload"
+          type="file"
+          className="sr-only"
+          onChange={onFileChange}
+          disabled={isPending}
+          ref={fileInputRef}
+        />
+        <Button asChild variant="ghost" size="sm" disabled={isPending}>
+          <label htmlFor="file-upload" className="cursor-pointer flex items-center gap-2 text-muted-foreground hover:text-foreground">
+            <Paperclip className="h-4 w-4" />
+            <span className="text-sm font-medium">Attach a file</span>
+          </label>
+        </Button>
+      </div>
+
+      <Button onClick={onSend} disabled={isPending || !hasContent} size="sm">
+        {isPending ? (
+          <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+        ) : (
+          <Zap className="mr-2 h-4 w-4" />
+        )}
+        Sync Clip
+      </Button>
+    </div>
+  );
+};
+
+export default ClipFormActions;
