@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
@@ -99,7 +100,7 @@ const AuthForm = () => {
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">
-        <Button className="w-full" onClick={() => handleOAuthSignIn('google')} disabled={isLoading}>
+        <Button variant="outline" className="w-full" onClick={() => handleOAuthSignIn('google')} disabled={isLoading}>
           <GoogleIcon className="mr-2 h-4 w-4" />
           {isSignUp ? 'Sign Up with Google' : 'Sign In with Google'}
         </Button>
@@ -142,7 +143,7 @@ const AuthForm = () => {
             </Button>
           </div>
         </div>
-        <Button onClick={handleAuth} variant="outline" disabled={isLoading} className="w-full">
+        <Button onClick={handleAuth} disabled={isLoading} className="w-full">
           {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
           {isSignUp ? 'Sign Up' : 'Sign In'}
         </Button>
