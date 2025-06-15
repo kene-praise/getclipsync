@@ -1,10 +1,10 @@
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Textarea } from '@/components/ui/textarea';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
-import { Upload, Send, Loader2 } from 'lucide-react';
+import { Paperclip, Zap, Loader2, X } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import { useAuth } from '@/contexts/AuthContext';
@@ -15,6 +15,7 @@ const CreateClipForm = () => {
   const [file, setFile] = useState<File | null>(null);
   const { user } = useAuth();
   const queryClient = useQueryClient();
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     const handleWindowFocus = async () => {
@@ -77,14 +78,14 @@ const CreateClipForm = () => {
       }
     },
     onSuccess: () => {
-      toast.success("Your clip has been sent!");
+      toast.success("Your clip has been synced!");
       queryClient.invalidateQueries({ queryKey: ['clips', user?.id] });
       setText('');
-      setFile(null);
+      handleClearFile();
     },
     onError: (error: any) => {
-      console.error('Error sending clip:', error);
-      toast.error(error.message || 'Failed to send clip. Please try again.');
+      console.error('Error syncing clip:', error);
+      toast.error(error.message || 'Failed to sync clip. Please try again.');
     }
   });
 
@@ -103,64 +104,79 @@ const CreateClipForm = () => {
   const handleTextChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     setText(e.target.value);
     if (e.target.value) {
-        setFile(null); // Clear file when text is entered
+        handleClearFile(); // Clear file when text is entered
     }
   }
+
+  const handleClearFile = () => {
+    setFile(null);
+    if (fileInputRef.current) {
+        fileInputRef.current.value = '';
+    }
+  };
 
   return (
     <Card className="w-full max-w-md animate-fade-in">
       <CardHeader>
-        <CardTitle>Send a Clip</CardTitle>
+        <CardTitle>Sync a Clip</CardTitle>
         <CardDescription>
           Paste text or upload a file to sync it across your devices.
         </CardDescription>
       </CardHeader>
-      <CardContent className="space-y-4">
-        <Textarea
-          placeholder="Paste your text or link here..."
-          value={text}
-          onChange={handleTextChange}
-          className="min-h-[120px] resize-none"
-          disabled={createClipMutation.isPending}
-        />
-        <div className="text-center text-muted-foreground my-2">OR</div>
-        <div className="relative">
-          <label
-            htmlFor="file-upload"
-            className="flex items-center justify-center w-full h-24 border-2 border-dashed rounded-lg cursor-pointer bg-muted hover:bg-secondary transition-colors"
-          >
-            {file ? (
-              <span className="text-foreground">{file.name}</span>
-            ) : (
-              <div className="flex flex-col items-center justify-center">
-                <Upload className="h-8 w-8 text-muted-foreground" />
-                <span className="mt-2 text-sm text-muted-foreground">
-                  Click to upload a file
-                </span>
-              </div>
-            )}
-          </label>
-          <Input 
-            id="file-upload" 
-            type="file" 
-            className="sr-only" 
-            onChange={handleFileChange}
+      <CardContent>
+        <div className="space-y-4">
+          <Textarea
+            placeholder="Paste your text or link here..."
+            value={text}
+            onChange={handleTextChange}
+            className="min-h-[120px] resize-none"
             disabled={createClipMutation.isPending}
           />
-        </div>
-        <Button onClick={handleSend} className="w-full" disabled={createClipMutation.isPending || (!text && !file)}>
-          {createClipMutation.isPending ? (
-            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-          ) : (
-            <>
-              <Send className="mr-2 h-4 w-4" />
-              Send Clip
-            </>
+
+          {file && (
+              <div className="flex items-center justify-between text-sm rounded-md border p-2 bg-muted/50">
+                  <div className="flex items-center gap-2 truncate">
+                      <Paperclip className="h-4 w-4 flex-shrink-0" />
+                      <span className="truncate text-muted-foreground">{file.name}</span>
+                  </div>
+                  <Button variant="ghost" size="icon" onClick={handleClearFile} className="h-6 w-6" disabled={createClipMutation.isPending}>
+                      <X className="h-4 w-4" />
+                      <span className="sr-only">Remove file</span>
+                  </Button>
+              </div>
           )}
-        </Button>
+
+          <div className="flex justify-between items-center">
+            <div>
+              <Input
+                id="file-upload"
+                type="file"
+                className="sr-only"
+                onChange={handleFileChange}
+                disabled={createClipMutation.isPending}
+                ref={fileInputRef}
+              />
+              <Button asChild variant="ghost" size="icon" disabled={createClipMutation.isPending} aria-label="Attach file">
+                  <label htmlFor="file-upload" className="cursor-pointer">
+                      <Paperclip className="h-5 w-5 text-muted-foreground" />
+                  </label>
+              </Button>
+            </div>
+
+            <Button onClick={handleSend} disabled={createClipMutation.isPending || (!text && !file)}>
+              {createClipMutation.isPending ? (
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+              ) : (
+                <Zap className="mr-2 h-4 w-4" />
+              )}
+              Sync Clip
+            </Button>
+          </div>
+        </div>
       </CardContent>
     </Card>
   );
 };
 
 export default CreateClipForm;
+
