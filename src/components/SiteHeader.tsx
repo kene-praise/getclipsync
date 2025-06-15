@@ -10,7 +10,7 @@ const SiteHeader = () => {
     return (
         <header className="sticky top-4 z-50">
             <div className="container mx-auto max-w-3xl">
-                <div className="flex items-center justify-between rounded-full bg-secondary/40 backdrop-blur-lg border border-secondary p-2 px-4">
+                <div className="flex items-center justify-between rounded-full bg-secondary/40 backdrop-blur-lg border border-secondary py-2 pl-4 pr-2">
                     <Link to="/" className="flex items-center gap-2 font-bold text-xl">
                         <Share2 className="h-6 w-6 text-primary" />
                         <span>ClipSync</span>

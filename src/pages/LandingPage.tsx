@@ -1,11 +1,14 @@
-
+import { useState } from 'react';
 import SiteHeader from '@/components/SiteHeader';
 import Footer from '@/components/Footer';
 import QuickShareForm from '@/components/QuickShareForm';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { CheckCircle } from 'lucide-react';
+import ReceiveClipPanel from '@/components/ReceiveClipPanel';
 
 const LandingPage = () => {
+  const [activeTab, setActiveTab] = useState('share');
+
   return (
     <div className="flex flex-col min-h-screen">
       <SiteHeader />
@@ -22,7 +25,33 @@ const LandingPage = () => {
             </div>
             
             <div className="mt-12 max-w-lg mx-auto">
-              <QuickShareForm />
+              <div className="flex justify-center mb-4">
+                <div className="inline-flex h-10 items-center justify-center rounded-md bg-muted p-1 text-muted-foreground">
+                  <button
+                    onClick={() => setActiveTab('share')}
+                    className={`inline-flex items-center justify-center whitespace-nowrap rounded-sm px-3 py-1.5 text-sm font-medium ring-offset-background transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 ${
+                      activeTab === 'share' ? 'bg-background text-foreground shadow-sm' : ''
+                    }`}
+                  >
+                    Share
+                  </button>
+                  <button
+                    onClick={() => setActiveTab('receive')}
+                    className={`inline-flex items-center justify-center whitespace-nowrap rounded-sm px-3 py-1.5 text-sm font-medium ring-offset-background transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 ${
+                      activeTab === 'receive' ? 'bg-background text-foreground shadow-sm' : ''
+                    }`}
+                  >
+                    Receive
+                  </button>
+                </div>
+              </div>
+
+              <div className={activeTab === 'share' ? 'block' : 'hidden'}>
+                <QuickShareForm />
+              </div>
+              <div className={activeTab === 'receive' ? 'block' : 'hidden'}>
+                <ReceiveClipPanel />
+              </div>
             </div>
           </div>
         </section>
