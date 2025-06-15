@@ -19,6 +19,7 @@ export type Database = {
           file_path: string | null
           id: string
           text_content: string | null
+          user_id: string | null
         }
         Insert: {
           code: string
@@ -29,6 +30,7 @@ export type Database = {
           file_path?: string | null
           id?: string
           text_content?: string | null
+          user_id?: string | null
         }
         Update: {
           code?: string
@@ -39,6 +41,25 @@ export type Database = {
           file_path?: string | null
           id?: string
           text_content?: string | null
+          user_id?: string | null
+        }
+        Relationships: []
+      }
+      profiles: {
+        Row: {
+          created_at: string
+          id: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          id: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          updated_at?: string
         }
         Relationships: []
       }

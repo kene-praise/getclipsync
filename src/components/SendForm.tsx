@@ -8,12 +8,14 @@ import { Upload, Link, Loader2, Copy } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import { QRCodeSVG as QRCode } from 'qrcode.react';
+import { useAuth } from '@/contexts/AuthContext';
 
 const SendForm = () => {
   const [text, setText] = useState('');
   const [file, setFile] = useState<File | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [code, setCode] = useState('');
+  const { user } = useAuth();
 
   const handleSend = async () => {
     if (!text && !file) {
@@ -50,6 +52,7 @@ const SendForm = () => {
           content_type: 'file',
           file_name: file.name,
           file_path: filePath,
+          user_id: user?.id,
         });
 
         if (dbError) throw dbError;
@@ -58,6 +61,7 @@ const SendForm = () => {
           code: generatedCode,
           content_type: 'text',
           text_content: text,
+          user_id: user?.id,
         });
 
         if (dbError) throw dbError;
