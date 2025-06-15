@@ -4,6 +4,8 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { InputOTP, InputOTPGroup, InputOTPSlot } from '@/components/ui/input-otp';
 import { Loader2, Download, Clipboard, FileText } from 'lucide-react';
+import { supabase } from '@/integrations/supabase/client';
+import { toast } from 'sonner';
 
 type ReceivedDataType = {
   type: 'text' | 'file';
@@ -25,16 +27,53 @@ const ReceiveForm = () => {
     setError('');
     setIsLoading(true);
 
-    // Simulate API call
-    await new Promise(resolve => setTimeout(resolve, 1500)); 
-    if (code === '123456') {
-      setReceivedData({ type: 'text', content: 'This is a test message from another device!' });
-    } else if (code === '789012') {
-      setReceivedData({ type: 'file', content: 'data:text/plain;base64,SGVsbG8sIFdvcmxkIQ==', fileName: 'example_document.pdf' });
-    } else {
-      setError('Invalid code. Please try again.');
+    try {
+      const { data: clip, error: fetchError } = await supabase
+        .from('clips')
+        .select('*')
+        .eq('code', code)
+        .single();
+
+      if (fetchError || !clip) {
+        throw new Error('Invalid or expired code. Please try again.');
+      }
+      
+      if (new Date(clip.expires_at) < new Date()) {
+        setError('This code has expired.');
+        toast.error('This code has expired.');
+        // Optionally, delete the expired clip
+        await supabase.from('clips').delete().eq('id', clip.id);
+        setIsLoading(false);
+        return;
+      }
+
+      if (clip.content_type === 'text' && clip.text_content) {
+        setReceivedData({ type: 'text', content: clip.text_content });
+      } else if (clip.content_type === 'file' && clip.file_path) {
+        const { data: fileData } = supabase.storage
+          .from('clip_files')
+          .getPublicUrl(clip.file_path);
+
+        if (!fileData) {
+          throw new Error('Could not retrieve file. It may have been deleted.');
+        }
+        
+        setReceivedData({
+          type: 'file',
+          content: fileData.publicUrl,
+          fileName: clip.file_name || 'download',
+        });
+      } else {
+        throw new Error('Clip data is corrupted or incomplete.');
+      }
+      toast.success('Clip received successfully!');
+
+    } catch (error: any) {
+      setError(error.message);
+      toast.error(error.message);
+    } finally {
+      setIsLoading(false);
     }
-    setIsLoading(false);
   };
   
   const handleReset = () => {
@@ -42,6 +81,13 @@ const ReceiveForm = () => {
     setReceivedData(null);
     setError('');
   };
+
+  const copyToClipboard = () => {
+    if(receivedData?.type === 'text') {
+      navigator.clipboard.writeText(receivedData.content);
+      toast.success("Text copied to clipboard!");
+    }
+  }
 
   if (receivedData) {
     return (
@@ -55,7 +101,7 @@ const ReceiveForm = () => {
               <>
                 <FileText className="h-12 w-12 mx-auto text-primary"/>
                 <p className="mt-4 text-center break-words">{receivedData.content}</p>
-                <Button className="w-full mt-4" onClick={() => navigator.clipboard.writeText(receivedData.content)}>
+                <Button className="w-full mt-4" onClick={copyToClipboard}>
                   <Clipboard className="mr-2 h-4 w-4" /> Copy to Clipboard
                 </Button>
               </>

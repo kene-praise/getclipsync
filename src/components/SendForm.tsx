@@ -1,10 +1,11 @@
-
 import { useState } from 'react';
 import { Textarea } from '@/components/ui/textarea';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
-import { Upload, Link, Loader2 } from 'lucide-react';
+import { Upload, Link, Loader2, Copy } from 'lucide-react';
+import { supabase } from '@/integrations/supabase/client';
+import { toast } from 'sonner';
 
 const SendForm = () => {
   const [text, setText] = useState('');
@@ -14,21 +15,71 @@ const SendForm = () => {
 
   const handleSend = async () => {
     if (!text && !file) {
-      console.log("Nothing to send");
+      toast.error("Nothing to send");
       return;
     }
     setIsLoading(true);
-    // Simulate API call
-    await new Promise(resolve => setTimeout(resolve, 1500)); 
-    const randomCode = Math.floor(100000 + Math.random() * 900000).toString();
-    setCode(randomCode);
-    setIsLoading(false);
+
+    let generatedCode = '';
+    let isCodeUnique = false;
+    try {
+      while (!isCodeUnique) {
+        generatedCode = Math.floor(100000 + Math.random() * 900000).toString();
+        const { data, error } = await supabase
+          .from('clips')
+          .select('code')
+          .eq('code', generatedCode)
+          .maybeSingle();
+
+        if (error) throw error;
+        if (!data) isCodeUnique = true;
+      }
+
+      if (file) {
+        const filePath = `${generatedCode}/${file.name}`;
+        const { error: uploadError } = await supabase.storage
+          .from('clip_files')
+          .upload(filePath, file);
+
+        if (uploadError) throw uploadError;
+
+        const { error: dbError } = await supabase.from('clips').insert({
+          code: generatedCode,
+          content_type: 'file',
+          file_name: file.name,
+          file_path: filePath,
+        });
+
+        if (dbError) throw dbError;
+      } else if (text) {
+        const { error: dbError } = await supabase.from('clips').insert({
+          code: generatedCode,
+          content_type: 'text',
+          text_content: text,
+        });
+
+        if (dbError) throw dbError;
+      }
+
+      setCode(generatedCode);
+      toast.success("Your code has been generated!");
+    } catch (error: any) {
+      console.error('Error sending clip:', error);
+      toast.error(error.message || 'Failed to send clip. Please try again.');
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const handleReset = () => {
     setText('');
     setFile(null);
     setCode('');
+  };
+
+  const copyCodeToClipboard = () => {
+    navigator.clipboard.writeText(code);
+    toast.success("Code copied to clipboard!");
   };
 
   if (code) {
@@ -41,8 +92,11 @@ const SendForm = () => {
           </CardDescription>
         </CardHeader>
         <CardContent className="flex flex-col items-center gap-4">
-          <div className="text-6xl font-bold tracking-widest bg-muted p-4 rounded-lg">
-            {code}
+          <div className="text-6xl font-bold tracking-widest bg-muted p-4 rounded-lg flex items-center gap-4">
+            <span>{code}</span>
+            <Button variant="ghost" size="icon" onClick={copyCodeToClipboard}>
+              <Copy className="h-8 w-8" />
+            </Button>
           </div>
           <p className="text-sm text-muted-foreground">This code will expire in 24 hours.</p>
           <Button onClick={handleReset} variant="outline">Send another clip</Button>
