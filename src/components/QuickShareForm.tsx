@@ -127,7 +127,7 @@ const QuickShareForm = () => {
         <Card className="animate-fade-in bg-secondary/20 backdrop-blur-md border border-white/10">
             <CardHeader className="text-center">
                 <CardTitle>Share This Clip!</CardTitle>
-                <CardDescription>Share this code or link. It will expire in 24 hours.</CardDescription>
+                <CardDescription>Share this code or link. It will expire in 1 hour.</CardDescription>
             </CardHeader>
             <CardContent className="flex flex-col items-center gap-6">
                 <div className="flex items-center gap-4">

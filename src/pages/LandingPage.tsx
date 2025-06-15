@@ -70,7 +70,7 @@ const LandingPage = () => {
                               <li>Paste any text or upload a file.</li>
                               <li>Click "Generate Share Link".</li>
                               <li>Share the generated code or link.</li>
-                              <li>Content expires automatically in 24 hours.</li>
+                              <li>Content expires automatically in 1 hour.</li>
                           </ol>
                       </CardContent>
                   </Card>
@@ -84,7 +84,7 @@ const LandingPage = () => {
                               <li>Your clipboard history is saved securely.</li>
                               <li>Access your clips from any device.</li>
                               <li>Enable auto-sync to capture clipboard on the fly.</li>
-                              <li>Your content never expires.</li>
+                              <li>Your content is kept for 30 days.</li>
                           </ol>
                       </CardContent>
                   </Card>
