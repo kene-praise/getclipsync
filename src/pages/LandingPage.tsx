@@ -15,7 +15,7 @@ const LandingPage = () => {
       <SiteHeader />
       <main className="flex-1">
         <section className="relative text-center py-20 md:py-28 overflow-hidden">
-          <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-[200%] max-w-[1400px] h-[80%] z-0 bg-[radial-gradient(ellipse_at_bottom,theme(colors.glow/0.1),transparent_60%)]" />
+          <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-[200%] max-w-[1400px] h-[80%] z-0 bg-[radial-gradient(ellipse_at_bottom,theme(colors.glow/0.15),transparent_50%)]" />
           
           <div className="relative z-10 container mx-auto px-4">
             <div className="max-w-3xl mx-auto">
