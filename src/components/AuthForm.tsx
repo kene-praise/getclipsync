@@ -48,7 +48,9 @@ const AuthForm = () => {
       });
 
       if (error) {
-        toast.error(error.message);
+        toast.error(error.message, {
+          description: "Can't log in? Try signing in with Google instead.",
+        });
       } else if (data.session) {
         // If email confirmation is disabled, a session is returned.
         toast.success('Account created successfully!');
@@ -92,12 +94,12 @@ const AuthForm = () => {
         <CardTitle>{isSignUp ? 'Create an Account' : 'Sign In'}</CardTitle>
         <CardDescription>
           {isSignUp 
-            ? 'Enter your details below to create an account.' 
+            ? 'For the best experience, we recommend signing up with Google.' 
             : 'Welcome back! Sign in to access your clips.'}
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">
-        <Button variant="outline" className="w-full" onClick={() => handleOAuthSignIn('google')} disabled={isLoading}>
+        <Button className="w-full" onClick={() => handleOAuthSignIn('google')} disabled={isLoading}>
           <GoogleIcon className="mr-2 h-4 w-4" />
           {isSignUp ? 'Sign Up with Google' : 'Sign In with Google'}
         </Button>
@@ -140,13 +142,19 @@ const AuthForm = () => {
             </Button>
           </div>
         </div>
-        <Button onClick={handleAuth} disabled={isLoading} className="w-full">
+        <Button onClick={handleAuth} variant="outline" disabled={isLoading} className="w-full">
           {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
           {isSignUp ? 'Sign Up' : 'Sign In'}
         </Button>
         <Button variant="link" className="w-full text-sm" onClick={toggleMode}>
           {isSignUp ? 'Already have an account? Sign In' : "Don't have an account? Sign Up"}
         </Button>
+        <div className="text-center text-sm text-muted-foreground pt-2">
+            Having trouble?{' '}
+            <a href="mailto:support@example.com" className="underline hover:text-primary">
+                Contact Support
+            </a>
+        </div>
       </CardContent>
     </Card>
   );
