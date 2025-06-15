@@ -7,44 +7,51 @@ import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import { useAuth } from '@/contexts/AuthContext';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { Switch } from "@/components/ui/switch";
+import { Label } from "@/components/ui/label";
 
 const CreateClipForm = () => {
   const [text, setText] = useState('');
   const [file, setFile] = useState<File | null>(null);
+  const [autoSyncOnFocus, setAutoSyncOnFocus] = useState(true);
   const { user } = useAuth();
   const queryClient = useQueryClient();
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     const handleWindowFocus = async () => {
-      if (!document.hasFocus()) return;
+      if (!document.hasFocus() || !autoSyncOnFocus) return;
 
       try {
         const clipboardText = await navigator.clipboard.readText();
         if (clipboardText && clipboardText.trim() !== '') {
-          setText(currentText => {
-            if (clipboardText.trim() !== currentText.trim()) {
-              setFile(null);
-              toast.info("Pasted from clipboard.");
-              return clipboardText;
+          // Only auto-sync if form is empty to avoid overwriting user input
+          if (text.trim() === '' && file === null) {
+            const clips = queryClient.getQueryData<any[]>(['clips', user?.id]);
+            const latestClipText = clips?.[0]?.text_content;
+
+            if (latestClipText?.trim() !== clipboardText.trim()) {
+              createClipMutation.mutate({ text: clipboardText, file: null }, {
+                onSuccess: () => {
+                  toast.info("Auto-synced from clipboard.");
+                  queryClient.invalidateQueries({ queryKey: ['clips', user?.id] });
+                }
+              });
             }
-            return currentText;
-          });
+          }
         }
       } catch (error) {
-        // Fail silently if clipboard access is denied or not supported.
+        // Fail silently if clipboard access is denied or not available.
         console.log('Clipboard read access denied or not available.');
       }
     };
 
     window.addEventListener('focus', handleWindowFocus);
-    // Check on initial load as well
-    handleWindowFocus();
 
     return () => {
       window.removeEventListener('focus', handleWindowFocus);
     };
-  }, []);
+  }, [autoSyncOnFocus, text, file, user?.id, queryClient, createClipMutation]);
 
   const createClipMutation = useMutation({
     mutationFn: async ({ text, file }: { text: string; file: File | null }) => {
@@ -76,10 +83,9 @@ const CreateClipForm = () => {
       }
     },
     onSuccess: () => {
-      toast.success("Your clip has been synced!");
+      // General success handler for query invalidation.
+      // Specific success actions (like toasts) are handled in the mutate calls.
       queryClient.invalidateQueries({ queryKey: ['clips', user?.id] });
-      setText('');
-      handleClearFile();
     },
     onError: (error: any) => {
       console.error('Error syncing clip:', error);
@@ -88,7 +94,14 @@ const CreateClipForm = () => {
   });
 
   const handleSend = () => {
-    createClipMutation.mutate({ text, file });
+    createClipMutation.mutate({ text, file }, {
+        onSuccess: () => {
+          toast.success("Your clip has been synced!");
+          queryClient.invalidateQueries({ queryKey: ['clips', user?.id] });
+          setText('');
+          handleClearFile();
+        },
+    });
   };
   
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -172,6 +185,19 @@ const CreateClipForm = () => {
             </div>
         )}
 
+        <div className="flex items-center justify-between rounded-lg border p-4">
+            <div className="space-y-0.5">
+                <Label htmlFor="autosync-toggle" className="font-semibold">Auto-sync from Clipboard</Label>
+                <p className="text-sm text-muted-foreground">
+                  If enabled, new content is synced automatically when you focus on this page.
+                </p>
+            </div>
+            <Switch
+                id="autosync-toggle"
+                checked={autoSyncOnFocus}
+                onCheckedChange={setAutoSyncOnFocus}
+            />
+        </div>
       </div>
     </div>
   );
