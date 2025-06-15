@@ -45,6 +45,11 @@ const ReceiveForm = ({ initialCode }: ReceiveFormProps) => {
       if (new Date(clip.expires_at) < new Date()) {
         setError('This code has expired.');
         toast.error('This code has expired.');
+
+        // Cleanup expired file from storage
+        if (clip.file_path) {
+          await supabase.storage.from('clip_files').remove([clip.file_path]);
+        }
         await supabase.from('clips').delete().eq('id', clip.id);
         setIsLoading(false);
         return;
@@ -70,6 +75,17 @@ const ReceiveForm = ({ initialCode }: ReceiveFormProps) => {
         throw new Error('Clip data is corrupted or incomplete.');
       }
       toast.success('Clip received successfully!');
+
+      // Self-destruct after read for privacy
+      try {
+        if (clip.file_path) {
+          await supabase.storage.from('clip_files').remove([clip.file_path]);
+        }
+        await supabase.from('clips').delete().eq('id', clip.id);
+      } catch (e: any) {
+        console.error("Failed to cleanup clip after retrieval", e.message);
+        // Do not bother user with this error. They got their data.
+      }
 
     } catch (error: any) {
       setError(error.message);
