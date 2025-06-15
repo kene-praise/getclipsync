@@ -1,9 +1,7 @@
-
 import { useState, useEffect, useRef } from 'react';
 import { Textarea } from '@/components/ui/textarea';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Paperclip, Zap, Loader2, X } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
@@ -116,68 +114,66 @@ const CreateClipForm = () => {
   };
 
   return (
-    <Card className="w-full max-w-md animate-fade-in">
-      <CardHeader>
-        <CardTitle>Sync a Clip</CardTitle>
-        <CardDescription>
+    <div className="w-full max-w-lg animate-fade-in space-y-4">
+      <div className="text-center">
+        <h2 className="text-2xl font-semibold tracking-tight">Sync a Clip</h2>
+        <p className="text-sm text-muted-foreground">
           Paste text or upload a file to sync it across your devices.
-        </CardDescription>
-      </CardHeader>
-      <CardContent>
-        <div className="space-y-4">
-          <div className="relative">
-            <Textarea
-              placeholder="Paste your text or link here..."
-              value={text}
-              onChange={handleTextChange}
-              className="min-h-[120px] resize-none pb-16"
-              disabled={createClipMutation.isPending}
-            />
-            <div className="absolute bottom-3 left-3 right-3 flex justify-between items-center">
-              <div>
-                <Input
-                  id="file-upload"
-                  type="file"
-                  className="sr-only"
-                  onChange={handleFileChange}
-                  disabled={createClipMutation.isPending}
-                  ref={fileInputRef}
-                />
-                <Button asChild variant="ghost" size="sm" disabled={createClipMutation.isPending}>
-                    <label htmlFor="file-upload" className="cursor-pointer flex items-center gap-2 text-muted-foreground hover:text-foreground">
-                        <Paperclip className="h-4 w-4" />
-                        <span className="text-xs font-medium">Attach a file</span>
-                    </label>
-                </Button>
-              </div>
-
-              <Button onClick={handleSend} disabled={createClipMutation.isPending || (!text && !file)} size="sm">
-                {createClipMutation.isPending ? (
-                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                ) : (
-                  <Zap className="mr-2 h-4 w-4" />
-                )}
-                Sync Clip
+        </p>
+      </div>
+      <div className="space-y-4">
+        <div className="overflow-hidden rounded-md border border-input bg-transparent focus-within:ring-2 focus-within:ring-ring focus-within:ring-offset-2 focus-within:ring-offset-background">
+          <Textarea
+            placeholder="Paste your text or link here..."
+            value={text}
+            onChange={handleTextChange}
+            className="min-h-[120px] w-full resize-none border-0 bg-transparent p-3 shadow-none focus-visible:ring-0"
+            disabled={createClipMutation.isPending}
+          />
+          <div className="flex items-center justify-between border-t border-input bg-muted/30 p-2 px-3">
+            <div>
+              <Input
+                id="file-upload"
+                type="file"
+                className="sr-only"
+                onChange={handleFileChange}
+                disabled={createClipMutation.isPending}
+                ref={fileInputRef}
+              />
+              <Button asChild variant="ghost" size="sm" disabled={createClipMutation.isPending}>
+                  <label htmlFor="file-upload" className="cursor-pointer flex items-center gap-2 text-muted-foreground hover:text-foreground">
+                      <Paperclip className="h-4 w-4" />
+                      <span className="text-sm font-medium">Attach a file</span>
+                  </label>
               </Button>
             </div>
+
+            <Button onClick={handleSend} disabled={createClipMutation.isPending || (!text && !file)} size="sm">
+              {createClipMutation.isPending ? (
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+              ) : (
+                <Zap className="mr-2 h-4 w-4" />
+              )}
+              Sync Clip
+            </Button>
           </div>
-
-          {file && (
-              <div className="flex items-center justify-between text-sm rounded-md border p-2 bg-muted/50">
-                  <div className="flex items-center gap-2 truncate">
-                      <Paperclip className="h-4 w-4 flex-shrink-0" />
-                      <span className="truncate text-muted-foreground">{file.name}</span>
-                  </div>
-                  <Button variant="ghost" size="icon" onClick={handleClearFile} className="h-6 w-6" disabled={createClipMutation.isPending}>
-                      <X className="h-4 w-4" />
-                      <span className="sr-only">Remove file</span>
-                  </Button>
-              </div>
-          )}
-
         </div>
-      </CardContent>
-    </Card>
+
+        {file && (
+            <div className="flex items-center justify-between text-sm rounded-md border p-2 bg-muted/50">
+                <div className="flex items-center gap-2 truncate">
+                    <Paperclip className="h-4 w-4 flex-shrink-0" />
+                    <span className="truncate text-muted-foreground">{file.name}</span>
+                </div>
+                <Button variant="ghost" size="icon" onClick={handleClearFile} className="h-6 w-6" disabled={createClipMutation.isPending}>
+                    <X className="h-4 w-4" />
+                    <span className="sr-only">Remove file</span>
+                </Button>
+            </div>
+        )}
+
+      </div>
+    </div>
   );
 };
 
