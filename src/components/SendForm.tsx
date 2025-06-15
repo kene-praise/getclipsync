@@ -84,6 +84,12 @@ const SendForm = () => {
     toast.success("Code copied to clipboard!");
   };
 
+  const copyUrlToClipboard = () => {
+    const receiveUrl = `${window.location.origin}/?code=${code}`;
+    navigator.clipboard.writeText(receiveUrl);
+    toast.success("Link copied to clipboard!");
+  };
+
   if (code) {
     const receiveUrl = `${window.location.origin}/?code=${code}`;
     return (
@@ -91,7 +97,7 @@ const SendForm = () => {
         <CardHeader>
           <CardTitle className="text-center text-2xl">Your Code</CardTitle>
           <CardDescription className="text-center">
-            Scan the QR code or enter the code on your other device.
+            Scan the QR code, copy the link, or enter the code below.
           </CardDescription>
         </CardHeader>
         <CardContent className="flex flex-col items-center gap-6">
@@ -113,12 +119,16 @@ const SendForm = () => {
           </div>
           <div className="text-4xl sm:text-5xl font-bold tracking-widest bg-muted p-3 sm:p-4 rounded-lg flex items-center gap-4">
             <span>{code}</span>
-            <Button variant="ghost" size="icon" onClick={copyCodeToClipboard}>
+            <Button variant="ghost" size="icon" onClick={copyCodeToClipboard} title="Copy code">
               <Copy className="h-7 w-7 sm:h-8 sm:w-8" />
             </Button>
           </div>
-          <p className="text-sm text-muted-foreground">This code will expire in 24 hours.</p>
-          <Button onClick={handleReset} variant="outline">Send another clip</Button>
+          <div className="flex flex-col sm:flex-row gap-4 w-full max-w-xs">
+            <Button onClick={copyUrlToClipboard} className="flex-1" variant="secondary">
+                <Link className="mr-2"/> Copy Link
+            </Button>
+            <Button onClick={handleReset} className="flex-1" variant="outline">Send New Clip</Button>
+          </div>
         </CardContent>
       </Card>
     );
