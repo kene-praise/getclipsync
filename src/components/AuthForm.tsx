@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
@@ -68,7 +69,7 @@ const AuthForm = () => {
   }
 
   return (
-    <Card className="w-full max-w-sm animate-fade-in">
+    <Card className="w-full max-w-sm animate-fade-in bg-secondary/20 backdrop-blur-md border border-white/10">
       <CardHeader>
         <CardTitle>{isSignUp ? 'Create an Account' : 'Sign In'}</CardTitle>
         <CardDescription>
