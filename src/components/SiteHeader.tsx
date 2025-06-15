@@ -1,7 +1,7 @@
 
 import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
-import { Clapperboard } from 'lucide-react';
+import { Share2 } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 
 const SiteHeader = () => {
@@ -11,7 +11,7 @@ const SiteHeader = () => {
         <header className="py-4 px-4 sm:px-6 lg:px-8 border-b sticky top-0 bg-background/95 backdrop-blur z-10">
             <div className="container mx-auto flex items-center justify-between">
                 <Link to="/" className="flex items-center gap-2 font-bold text-xl">
-                    <Clapperboard className="h-6 w-6 text-primary" />
+                    <Share2 className="h-6 w-6 text-primary" />
                     <span>ClipSync</span>
                 </Link>
                 <nav>

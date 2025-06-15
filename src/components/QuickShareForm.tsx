@@ -1,5 +1,5 @@
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useMutation } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
@@ -25,6 +25,26 @@ const QuickShareForm = () => {
   const [file, setFile] = useState<File | null>(null);
   const [sharedClip, setSharedClip] = useState<{ code: string; url: string } | null>(null);
   const [copied, setCopied] = useState(false);
+
+  useEffect(() => {
+    const pasteFromClipboard = async () => {
+      // Only paste if there's no text and no file yet.
+      if (textContent.trim() === '' && !file) {
+        try {
+          const text = await navigator.clipboard.readText();
+          if (text) {
+            setTextContent(text);
+            toast.info("Pasted from clipboard");
+          }
+        } catch (err) {
+          // Fail silently if clipboard permission is not granted.
+          console.info("Could not read from clipboard on load.");
+        }
+      }
+    };
+    pasteFromClipboard();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []); // Run only on mount
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
