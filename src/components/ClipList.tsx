@@ -30,7 +30,7 @@ const ClipList = () => {
     if (!user) return;
 
     const channel = supabase
-      .channel(`realtime-clips:${user.id}`)
+      .channel('clips-changes')
       .on(
         'postgres_changes',
         {

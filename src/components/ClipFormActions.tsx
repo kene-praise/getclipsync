@@ -34,11 +34,11 @@ const ClipFormActions: React.FC<ClipFormActionsProps> = ({ onSend, onFileChange,
 
       <Button onClick={onSend} disabled={isPending || !hasContent} size="sm">
         {isPending ? (
-          <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+          <Loader2 className="animate-spin" />
         ) : (
-          <Zap className="mr-2 h-4 w-4" />
+          <Zap />
         )}
-        Sync Clip
+        Start sync
       </Button>
     </div>
   );

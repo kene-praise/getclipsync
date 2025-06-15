@@ -58,7 +58,7 @@ const CreateClipForm = () => {
   return (
     <div className="w-full max-w-lg animate-fade-in space-y-4">
       <div className="text-center">
-        <h2 className="text-2xl font-semibold tracking-tight">Sync a Clip</h2>
+        <h2 className="text-2xl font-semibold tracking-tight">Sync your clipboard</h2>
         <p className="text-sm text-muted-foreground">
           Paste text or upload a file to sync it across your devices.
         </p>
