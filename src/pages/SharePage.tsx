@@ -23,7 +23,7 @@ import {
 } from 'lucide-react';
 import { toast as sonnerToast } from 'sonner';
 import { useState } from 'react';
-import AttachedFilePreview from '@/components/AttachedFilePreview';
+import SharedFilePreview from '@/components/SharedFilePreview';
 import { useAuth } from '@/contexts/AuthContext';
 
 const fetchClip = async (code: string) => {
@@ -55,7 +55,7 @@ const SharePage = () => {
 
   const handleCopyText = () => {
     if (data?.content_type === 'text') {
-      navigator.clipboard.writeText(data.content);
+      navigator.clipboard.writeText(data.text_content || '');
       setCopied(true);
       sonnerToast.success('Text copied to clipboard!');
       setTimeout(() => setCopied(false), 2000);
@@ -64,7 +64,7 @@ const SharePage = () => {
 
   const renderContent = () => {
     if (data?.content_type === 'text') {
-      return <p className="break-words">{data.content}</p>;
+      return <p className="break-words">{data.text_content}</p>;
     }
 
     if (data?.content_type === 'file' && data?.file_url) {
@@ -74,7 +74,7 @@ const SharePage = () => {
       );
 
       return (
-        <AttachedFilePreview fileUrl={data.file_url} isImage={isImage} />
+        <SharedFilePreview fileUrl={data.file_url} isImage={isImage} fileName={data.file_name} />
       );
     }
 
