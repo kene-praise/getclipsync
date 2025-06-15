@@ -11,12 +11,12 @@ const LandingPage = () => {
       <SiteHeader />
       <main className="flex-1">
         <section className="relative text-center py-20 md:py-28 overflow-hidden">
-          <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-[150%] max-w-[1200px] h-[60%] z-0 bg-[radial-gradient(ellipse_at_bottom,theme(colors.glow/0.15),transparent_70%)]" />
+          <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-[200%] max-w-[1400px] h-[80%] z-0 bg-[radial-gradient(ellipse_at_bottom,theme(colors.glow/0.1),transparent_60%)]" />
           
           <div className="relative z-10 container mx-auto px-4">
             <div className="max-w-3xl mx-auto">
-              <h1 className="text-4xl md:text-6xl font-bold tracking-tight">Seamlessly Sync Your Clipboard</h1>
-              <p className="mt-4 text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto">
+              <h1 className="text-4xl md:text-5xl font-bold tracking-tight">Seamlessly Sync Your Clipboard</h1>
+              <p className="mt-4 text-lg text-muted-foreground max-w-2xl mx-auto">
                 Instantly share text, links, or files between devices with a simple code. No account needed for a quick share.
               </p>
             </div>
