@@ -11,7 +11,6 @@ export type Database = {
     Tables: {
       clips: {
         Row: {
-          code: string
           content_type: string
           created_at: string
           expires_at: string
@@ -22,7 +21,6 @@ export type Database = {
           user_id: string | null
         }
         Insert: {
-          code: string
           content_type: string
           created_at?: string
           expires_at?: string
@@ -33,7 +31,6 @@ export type Database = {
           user_id?: string | null
         }
         Update: {
-          code?: string
           content_type?: string
           created_at?: string
           expires_at?: string

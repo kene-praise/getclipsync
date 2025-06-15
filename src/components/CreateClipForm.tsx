@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { Textarea } from '@/components/ui/textarea';
 import { Button } from '@/components/ui/button';
@@ -34,9 +33,6 @@ const CreateClipForm = () => {
           file_name: file.name,
           file_path: filePath,
           user_id: user.id,
-          // code is now a required field, but we don't use it.
-          // Let's use a placeholder. The RLS policies protect the data.
-          code: 'private', 
         });
         if (dbError) throw dbError;
       } else if (text) {
@@ -44,7 +40,6 @@ const CreateClipForm = () => {
           content_type: 'text',
           text_content: text,
           user_id: user.id,
-          code: 'private',
         });
         if (dbError) throw dbError;
       }
@@ -137,4 +132,3 @@ const CreateClipForm = () => {
 };
 
 export default CreateClipForm;
-
