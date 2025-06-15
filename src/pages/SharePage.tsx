@@ -1,130 +1,165 @@
-
 import { useParams, Link } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Loader2, AlertTriangle, FileText, Download, Copy } from 'lucide-react';
 import SiteHeader from '@/components/SiteHeader';
 import Footer from '@/components/Footer';
-import { toast } from 'sonner';
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+  CardFooter,
+} from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Skeleton } from '@/components/ui/skeleton';
+import {
+  Copy,
+  FileText,
+  Check,
+  Download,
+  Image as ImageIcon,
+  ArrowLeft,
+} from 'lucide-react';
+import { toast as sonnerToast } from 'sonner';
+import { useState } from 'react';
+import AttachedFilePreview from '@/components/AttachedFilePreview';
+import { useAuth } from '@/contexts/AuthContext';
 
-const fetchTemporaryClip = async (code: string) => {
-    const { data, error } = await supabase
-        .from('temporary_clips')
-        .select('*')
-        .eq('code', code.toUpperCase())
-        .maybeSingle();
+const fetchClip = async (code: string) => {
+  const { data, error } = await supabase
+    .from('temporary_clips')
+    .select('*')
+    .eq('code', code)
+    .single();
 
-    if (error) throw new Error(error.message);
-    return data;
+  if (error) {
+    console.error('Error fetching clip:', error);
+    throw new Error('Failed to fetch clip');
+  }
+
+  return data;
 };
 
 const SharePage = () => {
-    const { code } = useParams<{ code: string }>();
+  const { code } = useParams<{ code: string }>();
+  const [copied, setCopied] = useState(false);
+  const { user } = useAuth();
 
-    const { data: clip, isLoading, isError, error } = useQuery({
-        queryKey: ['temporary_clip', code],
-        queryFn: () => fetchTemporaryClip(code!),
-        enabled: !!code,
-    });
+  const { data, isLoading, isError } = useQuery({
+    queryKey: ['sharedClip', code],
+    queryFn: () => fetchClip(code!),
+    enabled: !!code,
+    staleTime: 60 * 1000, // 1 minute
+  });
 
-    const handleCopyText = () => {
-        if (clip?.text_content) {
-            navigator.clipboard.writeText(clip.text_content)
-                .then(() => {
-                    toast.success("Text copied to clipboard!");
-                })
-                .catch(err => {
-                    console.error('Failed to copy text: ', err);
-                    toast.error("Failed to copy text.");
-                });
-        }
-    };
+  const handleCopyText = () => {
+    if (data?.content_type === 'text') {
+      navigator.clipboard.writeText(data.content);
+      setCopied(true);
+      sonnerToast.success('Text copied to clipboard!');
+      setTimeout(() => setCopied(false), 2000);
+    }
+  };
 
-    const renderContent = () => {
-        if (isLoading) {
-            return (
-                <div className="flex flex-col items-center justify-center gap-4 text-muted-foreground py-8">
-                    <Loader2 className="h-8 w-8 animate-spin" />
-                    <p>Loading clip...</p>
-                </div>
-            );
-        }
+  const renderContent = () => {
+    if (data?.content_type === 'text') {
+      return <p className="break-words">{data.content}</p>;
+    }
 
-        if (isError) {
-            return (
-                <div className="flex flex-col items-center justify-center gap-4 text-destructive py-8">
-                    <AlertTriangle className="h-8 w-8" />
-                    <p>Error loading clip: {error.message}</p>
-                </div>
-            );
-        }
+    if (data?.content_type === 'file' && data?.file_url) {
+      const fileExtension = data.file_name?.split('.').pop() || '';
+      const isImage = ['jpg', 'jpeg', 'png', 'gif'].includes(
+        fileExtension.toLowerCase()
+      );
 
-        if (!clip) {
-            return (
-                <div className="flex flex-col items-center justify-center gap-4 text-muted-foreground py-8">
-                    <AlertTriangle className="h-8 w-8" />
-                    <p>Clip not found or has expired.</p>
-                    <Button asChild>
-                        <Link to="/">Share a new clip</Link>
+      return (
+        <AttachedFilePreview fileUrl={data.file_url} isImage={isImage} />
+      );
+    }
+
+    return <p>No content to display.</p>;
+  };
+
+  return (
+    <div className="flex min-h-screen flex-col">
+      <SiteHeader />
+      <main className="flex-1">
+        <div className="container flex h-full items-center justify-center py-8">
+          {isLoading ? (
+            <Skeleton className="h-[200px] w-full max-w-2xl" />
+          ) : isError || !data ? (
+            <Card className="w-full max-w-2xl">
+              <CardHeader>
+                <CardTitle>Clip Not Found</CardTitle>
+                <CardDescription>
+                  This clip may have expired or never existed.
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <p>
+                  Quick shares expire after 1 hour. For longer retention, sign
+                  up for a free account.
+                </p>
+              </CardContent>
+            </Card>
+          ) : (
+            <div className="w-full max-w-2xl space-y-4">
+              <Card className="w-full max-w-2xl animate-fade-in">
+                <CardHeader>
+                  <CardTitle>Shared Clip</CardTitle>
+                  <CardDescription>
+                    This clip was shared via ClipSync. It expires 1 hour after
+                    creation.
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>{renderContent()}</CardContent>
+                <CardFooter className="flex justify-end gap-2">
+                  {data.content_type === 'text' && (
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={handleCopyText}
+                    >
+                      {copied ? (
+                        <Check className="h-4 w-4" />
+                      ) : (
+                        <Copy className="h-4 w-4" />
+                      )}
+                      <span className="ml-2">
+                        {copied ? 'Copied!' : 'Copy Text'}
+                      </span>
                     </Button>
-                </div>
-            );
-        }
-        
-        return (
-            <div className="space-y-4 w-full">
-                {clip.text_content && (
-                    <div className="space-y-2">
-                        <div className="flex items-center justify-between">
-                            <h3 className="font-semibold">Text Content</h3>
-                            <Button variant="ghost" size="sm" onClick={handleCopyText}>
-                                <Copy className="mr-2 h-4 w-4" />
-                                Copy
-                            </Button>
-                        </div>
-                        <pre className="p-4 bg-muted rounded-md text-sm whitespace-pre-wrap font-sans">{clip.text_content}</pre>
-                    </div>
-                )}
-                {clip.file_url && (
-                    <div className="space-y-2">
-                        <h3 className="font-semibold">Attached File</h3>
-                        <div className="flex items-center justify-between rounded-md border p-3">
-                            <div className="flex items-center gap-2 truncate">
-                                <FileText className="h-5 w-5 flex-shrink-0" />
-                                <span className="truncate">{clip.file_name || 'Attached File'}</span>
-                            </div>
-                            <Button asChild>
-                                <a href={clip.file_url} target="_blank" rel="noopener noreferrer" download={clip.file_name || true}>
-                                    <Download className="mr-2 h-4 w-4" />
-                                    Download
-                                </a>
-                            </Button>
-                        </div>
-                    </div>
-                )}
+                  )}
+                  {data.content_type === 'file' && data.file_url && (
+                    <Button variant="outline" size="sm" asChild>
+                      <a
+                        href={data.file_url}
+                        download={data.file_name || 'download'}
+                      >
+                        <Download className="h-4 w-4" />
+                        <span className="ml-2">Download File</span>
+                      </a>
+                    </Button>
+                  )}
+                </CardFooter>
+              </Card>
+
+              {user && (
+                <Button asChild variant="outline">
+                  <Link to="/app" className="flex items-center">
+                    <ArrowLeft className="mr-2 h-4 w-4" />
+                    Back to App
+                  </Link>
+                </Button>
+              )}
             </div>
-        )
-    };
-    
-    return (
-        <div className="flex flex-col min-h-screen">
-            <SiteHeader />
-            <main className="flex-1 flex items-center justify-center container mx-auto px-4 py-8">
-                <Card className="w-full max-w-2xl animate-fade-in">
-                    <CardHeader>
-                        <CardTitle>Shared Clip</CardTitle>
-                        <CardDescription>This clip was shared via ClipSync. It expires 1 hour after creation.</CardDescription>
-                    </CardHeader>
-                    <CardContent>
-                        {renderContent()}
-                    </CardContent>
-                </Card>
-            </main>
-            <Footer />
+          )}
         </div>
-    );
+      </main>
+      <Footer />
+    </div>
+  );
 };
 
 export default SharePage;
