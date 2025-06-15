@@ -8,28 +8,30 @@ const SiteHeader = () => {
     const { user } = useAuth();
 
     return (
-        <header className="py-4 px-4 sm:px-6 lg:px-8 border-b sticky top-0 bg-background/95 backdrop-blur z-10">
-            <div className="container mx-auto flex items-center justify-between">
-                <Link to="/" className="flex items-center gap-2 font-bold text-xl">
-                    <Share2 className="h-6 w-6 text-primary" />
-                    <span>ClipSync</span>
-                </Link>
-                <nav>
-                    {user ? (
-                         <Button asChild>
-                            <Link to="/app">Go to App</Link>
-                        </Button>
-                    ) : (
-                        <div className="flex items-center gap-2">
-                            <Button variant="ghost" asChild>
-                                <Link to="/auth">Sign In</Link>
-                            </Button>
+        <header className="sticky top-4 z-50">
+            <div className="container mx-auto">
+                <div className="flex items-center justify-between rounded-full bg-secondary/40 backdrop-blur-lg border border-secondary p-2 px-4">
+                    <Link to="/" className="flex items-center gap-2 font-bold text-xl">
+                        <Share2 className="h-6 w-6 text-primary" />
+                        <span>ClipSync</span>
+                    </Link>
+                    <nav>
+                        {user ? (
                             <Button asChild>
-                                <Link to={{ pathname: '/auth' }} state={{ isSignUp: true }}>Sign Up</Link>
+                                <Link to="/app">Go to App</Link>
                             </Button>
-                        </div>
-                    )}
-                </nav>
+                        ) : (
+                            <div className="flex items-center gap-2">
+                                <Button variant="ghost" asChild>
+                                    <Link to="/auth">Sign In</Link>
+                                </Button>
+                                <Button asChild>
+                                    <Link to={{ pathname: '/auth' }} state={{ isSignUp: true }}>Sign Up</Link>
+                                </Button>
+                            </div>
+                        )}
+                    </nav>
+                </div>
             </div>
         </header>
     );
