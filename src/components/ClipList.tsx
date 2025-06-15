@@ -18,6 +18,7 @@ const ClipList = () => {
       const { data, error } = await supabase
         .from('clips')
         .select('*')
+        .eq('user_id', user.id) // Explicitly filter for the current user's clips
         .order('created_at', { ascending: false });
       if (error) throw new Error(error.message);
       return data;
