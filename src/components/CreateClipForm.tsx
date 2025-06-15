@@ -125,13 +125,42 @@ const CreateClipForm = () => {
       </CardHeader>
       <CardContent>
         <div className="space-y-4">
-          <Textarea
-            placeholder="Paste your text or link here..."
-            value={text}
-            onChange={handleTextChange}
-            className="min-h-[120px] resize-none"
-            disabled={createClipMutation.isPending}
-          />
+          <div className="relative">
+            <Textarea
+              placeholder="Paste your text or link here..."
+              value={text}
+              onChange={handleTextChange}
+              className="min-h-[120px] resize-none pb-16"
+              disabled={createClipMutation.isPending}
+            />
+            <div className="absolute bottom-3 left-3 right-3 flex justify-between items-center">
+              <div>
+                <Input
+                  id="file-upload"
+                  type="file"
+                  className="sr-only"
+                  onChange={handleFileChange}
+                  disabled={createClipMutation.isPending}
+                  ref={fileInputRef}
+                />
+                <Button asChild variant="ghost" size="sm" disabled={createClipMutation.isPending}>
+                    <label htmlFor="file-upload" className="cursor-pointer flex items-center gap-2 text-muted-foreground hover:text-foreground">
+                        <Paperclip className="h-4 w-4" />
+                        <span className="text-xs font-medium">Attach a file</span>
+                    </label>
+                </Button>
+              </div>
+
+              <Button onClick={handleSend} disabled={createClipMutation.isPending || (!text && !file)} size="sm">
+                {createClipMutation.isPending ? (
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                ) : (
+                  <Zap className="mr-2 h-4 w-4" />
+                )}
+                Sync Clip
+              </Button>
+            </div>
+          </div>
 
           {file && (
               <div className="flex items-center justify-between text-sm rounded-md border p-2 bg-muted/50">
@@ -146,32 +175,6 @@ const CreateClipForm = () => {
               </div>
           )}
 
-          <div className="flex justify-between items-center">
-            <div>
-              <Input
-                id="file-upload"
-                type="file"
-                className="sr-only"
-                onChange={handleFileChange}
-                disabled={createClipMutation.isPending}
-                ref={fileInputRef}
-              />
-              <Button asChild variant="ghost" size="icon" disabled={createClipMutation.isPending} aria-label="Attach file">
-                  <label htmlFor="file-upload" className="cursor-pointer">
-                      <Paperclip className="h-5 w-5 text-muted-foreground" />
-                  </label>
-              </Button>
-            </div>
-
-            <Button onClick={handleSend} disabled={createClipMutation.isPending || (!text && !file)}>
-              {createClipMutation.isPending ? (
-                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-              ) : (
-                <Zap className="mr-2 h-4 w-4" />
-              )}
-              Sync Clip
-            </Button>
-          </div>
         </div>
       </CardContent>
     </Card>
@@ -179,4 +182,3 @@ const CreateClipForm = () => {
 };
 
 export default CreateClipForm;
-
