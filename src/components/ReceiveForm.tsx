@@ -1,5 +1,4 @@
-
-import { useState } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { InputOTP, InputOTPGroup, InputOTPSlot } from '@/components/ui/input-otp';
@@ -13,15 +12,20 @@ type ReceivedDataType = {
   fileName?: string;
 }
 
-const ReceiveForm = () => {
-  const [code, setCode] = useState('');
-  const [isLoading, setIsLoading] = useState(false);
+type ReceiveFormProps = {
+  initialCode?: string | null;
+};
+
+const ReceiveForm = ({ initialCode }: ReceiveFormProps) => {
+  const [code, setCode] = useState(initialCode || '');
+  const [isLoading, setIsLoading] = useState(!!initialCode);
   const [receivedData, setReceivedData] = useState<ReceivedDataType | null>(null);
   const [error, setError] = useState('');
 
-  const handleReceive = async () => {
-    if (code.length < 6) {
+  const fetchClip = useCallback(async (clipCode: string) => {
+    if (clipCode.length < 6) {
       setError('Please enter a 6-digit code.');
+      setIsLoading(false);
       return;
     }
     setError('');
@@ -31,7 +35,7 @@ const ReceiveForm = () => {
       const { data: clip, error: fetchError } = await supabase
         .from('clips')
         .select('*')
-        .eq('code', code)
+        .eq('code', clipCode)
         .single();
 
       if (fetchError || !clip) {
@@ -41,7 +45,6 @@ const ReceiveForm = () => {
       if (new Date(clip.expires_at) < new Date()) {
         setError('This code has expired.');
         toast.error('This code has expired.');
-        // Optionally, delete the expired clip
         await supabase.from('clips').delete().eq('id', clip.id);
         setIsLoading(false);
         return;
@@ -74,12 +77,21 @@ const ReceiveForm = () => {
     } finally {
       setIsLoading(false);
     }
-  };
+  }, []);
+
+  useEffect(() => {
+    if (initialCode) {
+      fetchClip(initialCode);
+    }
+  }, [initialCode, fetchClip]);
   
   const handleReset = () => {
     setCode('');
     setReceivedData(null);
     setError('');
+    if (initialCode) {
+      window.history.pushState({}, '', '/');
+    }
   };
 
   const copyToClipboard = () => {
@@ -143,7 +155,7 @@ const ReceiveForm = () => {
           </InputOTPGroup>
         </InputOTP>
         {error && <p className="text-sm text-destructive">{error}</p>}
-        <Button onClick={handleReceive} className="w-full" disabled={isLoading || code.length < 6}>
+        <Button onClick={() => fetchClip(code)} className="w-full" disabled={isLoading || code.length < 6}>
           {isLoading ? (
             <Loader2 className="mr-2 h-4 w-4 animate-spin" />
           ) : (

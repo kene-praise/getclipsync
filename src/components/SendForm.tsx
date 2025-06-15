@@ -6,6 +6,7 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/com
 import { Upload, Link, Loader2, Copy } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
+import QRCode from 'qrcode.react';
 
 const SendForm = () => {
   const [text, setText] = useState('');
@@ -83,19 +84,36 @@ const SendForm = () => {
   };
 
   if (code) {
+    const receiveUrl = `${window.location.origin}/?code=${code}`;
     return (
       <Card className="w-full max-w-md animate-fade-in">
         <CardHeader>
           <CardTitle className="text-center text-2xl">Your Code</CardTitle>
           <CardDescription className="text-center">
-            Enter this code on your other device to receive your data.
+            Scan the QR code or enter the code on your other device.
           </CardDescription>
         </CardHeader>
-        <CardContent className="flex flex-col items-center gap-4">
-          <div className="text-6xl font-bold tracking-widest bg-muted p-4 rounded-lg flex items-center gap-4">
+        <CardContent className="flex flex-col items-center gap-6">
+           <div className="p-4 bg-white rounded-lg shadow-md">
+            <QRCode
+              value={receiveUrl}
+              size={192}
+              bgColor="#ffffff"
+              fgColor="#000000"
+              level="H"
+              includeMargin={false}
+              imageSettings={{
+                src: "/favicon.ico",
+                height: 32,
+                width: 32,
+                excavate: true,
+              }}
+            />
+          </div>
+          <div className="text-4xl sm:text-5xl font-bold tracking-widest bg-muted p-3 sm:p-4 rounded-lg flex items-center gap-4">
             <span>{code}</span>
             <Button variant="ghost" size="icon" onClick={copyCodeToClipboard}>
-              <Copy className="h-8 w-8" />
+              <Copy className="h-7 w-7 sm:h-8 sm:w-8" />
             </Button>
           </div>
           <p className="text-sm text-muted-foreground">This code will expire in 24 hours.</p>

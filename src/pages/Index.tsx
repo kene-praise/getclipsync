@@ -1,23 +1,32 @@
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import SendForm from '@/components/SendForm';
 import ReceiveForm from '@/components/ReceiveForm';
 import { ArrowLeftRight } from 'lucide-react';
+import { useSearchParams } from 'react-router-dom';
 
 type View = 'menu' | 'send' | 'receive';
 
 const Index = () => {
   const [view, setView] = useState<View>('menu');
+  const [searchParams] = useSearchParams();
+  const codeFromUrl = searchParams.get('code');
+
+  useEffect(() => {
+    if (codeFromUrl && codeFromUrl.length === 6) {
+      setView('receive');
+    }
+  }, [codeFromUrl]);
 
   const renderContent = () => {
     switch (view) {
       case 'send':
         return <SendForm />;
       case 'receive':
-        return <ReceiveForm />;
+        return <ReceiveForm initialCode={view === 'receive' ? codeFromUrl : null} />;
       case 'menu':
       default:
         return (
@@ -41,6 +50,14 @@ const Index = () => {
     }
   };
 
+  const handleSetView = (newView: View) => {
+    if (newView === 'menu' && codeFromUrl) {
+      // If returning to menu, clear the URL param to avoid being stuck in receive mode
+      window.history.pushState({}, '', '/');
+    }
+    setView(newView);
+  }
+
   return (
     <div className="flex flex-col min-h-screen bg-background text-foreground">
       <Header />
@@ -48,7 +65,7 @@ const Index = () => {
         {view !== 'menu' && (
           <Button 
             variant="ghost" 
-            onClick={() => setView('menu')} 
+            onClick={() => handleSetView('menu')} 
             className="absolute top-24 left-4 sm:left-8 text-muted-foreground hover:text-foreground"
           >
             <ArrowLeftRight className="mr-2 h-4 w-4" />
