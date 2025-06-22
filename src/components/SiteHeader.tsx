@@ -15,11 +15,19 @@ const SiteHeader = () => {
                         <Share2 className="h-6 w-6 text-primary" />
                         <span>ClipSync</span>
                     </Link>
-                    <nav>
+                    <nav className="flex items-center gap-2">
+                        <Button variant="ghost" asChild className="rounded-full">
+                            <Link to="/pricing">Pricing</Link>
+                        </Button>
                         {user ? (
-                            <Button asChild className="rounded-full">
-                                <Link to="/app">Go to App</Link>
-                            </Button>
+                            <div className="flex items-center gap-2">
+                                <Button variant="ghost" asChild className="rounded-full">
+                                    <Link to="/admin">Admin</Link>
+                                </Button>
+                                <Button asChild className="rounded-full">
+                                    <Link to="/app">Go to App</Link>
+                                </Button>
+                            </div>
                         ) : (
                             <div className="flex items-center gap-2">
                                 <Button variant="ghost" asChild className="rounded-full">

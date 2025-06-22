@@ -2,11 +2,13 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
+import { useAnalytics } from '@/hooks/useAnalytics';
 import { toast } from 'sonner';
 
 export const useCreateClip = () => {
   const { user } = useAuth();
   const queryClient = useQueryClient();
+  const { trackEvent } = useAnalytics();
 
   return useMutation({
     mutationFn: async ({ text, file }: { text: string; file: File | null }) => {
@@ -27,6 +29,16 @@ export const useCreateClip = () => {
           user_id: user.id,
         });
         if (dbError) throw dbError;
+
+        // Track analytics
+        trackEvent({ 
+          eventType: 'file_uploaded', 
+          eventData: { 
+            fileName: file.name, 
+            fileSize: file.size,
+            contentType: file.type 
+          } 
+        });
       } else if (text) {
         const { error: dbError } = await supabase.from('clips').insert({
           content_type: 'text',
@@ -34,6 +46,15 @@ export const useCreateClip = () => {
           user_id: user.id,
         });
         if (dbError) throw dbError;
+
+        // Track analytics
+        trackEvent({ 
+          eventType: 'clip_created', 
+          eventData: { 
+            textLength: text.length,
+            contentType: 'text' 
+          } 
+        });
       }
     },
     onSuccess: () => {
