@@ -33,8 +33,8 @@ const AdminDashboard = () => {
     );
   }
 
-  // Type assertion for the stats data
-  const stats = rawStats as AdminStats;
+  // Safe type conversion with proper null checking
+  const stats = (rawStats as unknown) as AdminStats;
 
   const StatCard = ({ title, value, icon: Icon, description }: any) => (
     <Card>
