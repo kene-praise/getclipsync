@@ -3,8 +3,19 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { useAdminStats } from '@/hooks/useAdminStats';
 import { Loader2, Users, FileText, Share2, CreditCard, TrendingUp, Database } from 'lucide-react';
 
+// Define the interface for admin stats
+interface AdminStats {
+  total_users: number;
+  active_subscriptions: number;
+  total_clips: number;
+  total_temp_clips: number;
+  new_users_today: number;
+  clips_created_today: number;
+  storage_usage_mb: number;
+}
+
 const AdminDashboard = () => {
-  const { data: stats, isLoading, error } = useAdminStats();
+  const { data: rawStats, isLoading, error } = useAdminStats();
 
   if (isLoading) {
     return (
@@ -21,6 +32,9 @@ const AdminDashboard = () => {
       </div>
     );
   }
+
+  // Type assertion for the stats data
+  const stats = rawStats as AdminStats;
 
   const StatCard = ({ title, value, icon: Icon, description }: any) => (
     <Card>
