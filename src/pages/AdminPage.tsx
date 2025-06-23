@@ -1,16 +1,45 @@
 
 import { useAuth } from '@/contexts/AuthContext';
 import { Navigate } from 'react-router-dom';
+import { useAdminCheck } from '@/hooks/useAdminCheck';
 import AdminDashboard from '@/components/AdminDashboard';
 import Header from '@/components/Header';
+import { Loader2, Shield } from 'lucide-react';
 
 const AdminPage = () => {
-  const { user } = useAuth();
+  const { user, isLoading: authLoading } = useAuth();
+  const { data: isAdmin, isLoading: adminCheckLoading } = useAdminCheck();
 
-  // For now, allow any authenticated user to access admin
-  // In production, you'd check for admin role
+  // Show loading while checking authentication
+  if (authLoading || adminCheckLoading) {
+    return (
+      <div className="flex h-screen w-full items-center justify-center">
+        <Loader2 className="h-8 w-8 animate-spin" />
+      </div>
+    );
+  }
+
+  // Redirect to auth if not logged in
   if (!user) {
     return <Navigate to="/auth" replace />;
+  }
+
+  // Show access denied if not admin
+  if (!isAdmin) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <div className="text-center space-y-4">
+          <Shield className="h-16 w-16 mx-auto text-muted-foreground" />
+          <h1 className="text-2xl font-bold">Access Denied</h1>
+          <p className="text-muted-foreground">
+            You don't have permission to access the admin dashboard.
+          </p>
+          <p className="text-sm text-muted-foreground">
+            Contact the administrator if you believe this is an error.
+          </p>
+        </div>
+      </div>
+    );
   }
 
   return (

@@ -1,10 +1,11 @@
 
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { useAdminStats } from '@/hooks/useAdminStats';
+import { useAdminStatsWithContent } from '@/hooks/useAdminStatsWithContent';
 import { Loader2, Users, FileText, Share2, CreditCard, TrendingUp, Database } from 'lucide-react';
+import AdminContentDisplay from './AdminContentDisplay';
 
-// Define the interface for admin stats
-interface AdminStats {
+// Define the interface for enhanced admin stats
+interface AdminStatsWithContent {
   total_users: number;
   active_subscriptions: number;
   total_clips: number;
@@ -12,10 +13,12 @@ interface AdminStats {
   new_users_today: number;
   clips_created_today: number;
   storage_usage_mb: number;
+  recent_clips: any[];
+  recent_temp_clips: any[];
 }
 
 const AdminDashboard = () => {
-  const { data: rawStats, isLoading, error } = useAdminStats();
+  const { data: rawStats, isLoading, error } = useAdminStatsWithContent();
 
   if (isLoading) {
     return (
@@ -34,7 +37,7 @@ const AdminDashboard = () => {
   }
 
   // Safe type conversion with proper null checking
-  const stats = (rawStats as unknown) as AdminStats;
+  const stats = (rawStats as unknown) as AdminStatsWithContent;
 
   const StatCard = ({ title, value, icon: Icon, description }: any) => (
     <Card>
@@ -105,6 +108,12 @@ const AdminDashboard = () => {
           description="Total file storage used"
         />
       </div>
+
+      {/* Content Display Section */}
+      <AdminContentDisplay 
+        recentClips={stats?.recent_clips || []}
+        recentTempClips={stats?.recent_temp_clips || []}
+      />
     </div>
   );
 };

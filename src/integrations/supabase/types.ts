@@ -9,6 +9,27 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
+      admin_users: {
+        Row: {
+          created_at: string
+          email: string
+          id: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          email: string
+          id?: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          email?: string
+          id?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       clips: {
         Row: {
           content_type: string
@@ -195,6 +216,14 @@ export type Database = {
       get_admin_stats: {
         Args: Record<PropertyKey, never>
         Returns: Json
+      }
+      get_admin_stats_with_content: {
+        Args: Record<PropertyKey, never>
+        Returns: Json
+      }
+      is_admin: {
+        Args: { user_email: string }
+        Returns: boolean
       }
       track_user_event: {
         Args: {
