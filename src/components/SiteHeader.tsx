@@ -3,9 +3,11 @@ import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Share2 } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
+import { useAdminCheck } from '@/hooks/useAdminCheck';
 
 const SiteHeader = () => {
     const { user } = useAuth();
+    const { data: isAdmin } = useAdminCheck();
 
     return (
         <header className="sticky top-6 z-50">
@@ -22,8 +24,13 @@ const SiteHeader = () => {
                         {user ? (
                             <div className="flex items-center gap-2">
                                 <Button variant="ghost" asChild className="rounded-full">
-                                    <Link to="/admin">Admin</Link>
+                                    <Link to="/">Go to Website</Link>
                                 </Button>
+                                {isAdmin && (
+                                    <Button variant="ghost" asChild className="rounded-full">
+                                        <Link to="/admin">Admin</Link>
+                                    </Button>
+                                )}
                                 <Button asChild className="rounded-full">
                                     <Link to="/app">Go to App</Link>
                                 </Button>
