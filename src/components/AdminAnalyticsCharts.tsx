@@ -9,13 +9,34 @@ import { useClipAnalytics } from '@/hooks/useClipAnalytics';
 import { useContentTypeDistribution } from '@/hooks/useContentTypeDistribution';
 import { TrendingUp, Users, FileText, PieChart as PieChartIcon } from 'lucide-react';
 
+interface SignupData {
+  date: string;
+  signups: number;
+}
+
+interface ClipData {
+  date: string;
+  clips: number;
+}
+
+interface ContentTypeData {
+  type: string;
+  count: number;
+  percentage: number;
+}
+
 const AdminAnalyticsCharts = () => {
   const [signupPeriod, setSignupPeriod] = useState(30);
   const [clipPeriod, setClipPeriod] = useState(30);
 
-  const { data: signupData, isLoading: signupLoading } = useSignupAnalytics(signupPeriod);
-  const { data: clipData, isLoading: clipLoading } = useClipAnalytics(clipPeriod);
-  const { data: contentTypeData, isLoading: contentTypeLoading } = useContentTypeDistribution();
+  const { data: rawSignupData, isLoading: signupLoading } = useSignupAnalytics(signupPeriod);
+  const { data: rawClipData, isLoading: clipLoading } = useClipAnalytics(clipPeriod);
+  const { data: rawContentTypeData, isLoading: contentTypeLoading } = useContentTypeDistribution();
+
+  // Type guards and data transformation
+  const signupData: SignupData[] = Array.isArray(rawSignupData) ? rawSignupData as SignupData[] : [];
+  const clipData: ClipData[] = Array.isArray(rawClipData) ? rawClipData as ClipData[] : [];
+  const contentTypeData: ContentTypeData[] = Array.isArray(rawContentTypeData) ? rawContentTypeData as ContentTypeData[] : [];
 
   const chartConfig = {
     signups: {
@@ -66,7 +87,7 @@ const AdminAnalyticsCharts = () => {
           </CardHeader>
           <CardContent>
             <ChartContainer config={chartConfig} className="h-[200px]">
-              <LineChart data={signupData || []}>
+              <LineChart data={signupData}>
                 <CartesianGrid strokeDasharray="3 3" />
                 <XAxis 
                   dataKey="date" 
@@ -109,7 +130,7 @@ const AdminAnalyticsCharts = () => {
           </CardHeader>
           <CardContent>
             <ChartContainer config={chartConfig} className="h-[200px]">
-              <LineChart data={clipData || []}>
+              <LineChart data={clipData}>
                 <CartesianGrid strokeDasharray="3 3" />
                 <XAxis 
                   dataKey="date" 
@@ -144,7 +165,7 @@ const AdminAnalyticsCharts = () => {
             <ResponsiveContainer width="100%" height="100%">
               <PieChart>
                 <Pie
-                  data={contentTypeData || []}
+                  data={contentTypeData}
                   cx="50%"
                   cy="50%"
                   labelLine={false}
@@ -153,7 +174,7 @@ const AdminAnalyticsCharts = () => {
                   fill="#8884d8"
                   dataKey="count"
                 >
-                  {(contentTypeData || []).map((entry: any, index: number) => (
+                  {contentTypeData.map((entry, index) => (
                     <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
                   ))}
                 </Pie>
