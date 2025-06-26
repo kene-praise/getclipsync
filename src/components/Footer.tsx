@@ -1,10 +1,7 @@
-
 import { Link } from 'react-router-dom';
 import { Share2 } from 'lucide-react';
-
 const Footer = () => {
-  return (
-    <footer className="border-t bg-background">
+  return <footer className="border-t bg-background">
       <div className="container mx-auto px-4 py-8">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
           <div className="space-y-4">
@@ -72,11 +69,9 @@ const Footer = () => {
         </div>
         
         <div className="border-t mt-8 pt-8 text-center text-sm text-muted-foreground">
-          <p>&copy; 2024 ClipSync. All rights reserved. Made with ❤️ for secure sharing.</p>
+          <p>© 2025 ClipSync. All rights reserved. Made with ❤️ for secure sharing.</p>
         </div>
       </div>
-    </footer>
-  );
+    </footer>;
 };
-
 export default Footer;

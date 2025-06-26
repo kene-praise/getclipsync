@@ -17,9 +17,8 @@ const LandingPage = () => {
               Sync Your Clipboard
               <span className="text-primary block">Across All Devices</span>
             </h1>
-            <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-              Seamlessly share text and files between your devices. Free, secure, and privacy-focused.
-            </p>
+            <p className="text-xl text-muted-foreground max-w-2xl mx-auto">Seamlessly share text and files between your devices. 
+Free, secure, and privacy-focused.</p>
           </div>
           
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
