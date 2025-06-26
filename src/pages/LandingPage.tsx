@@ -6,7 +6,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Share2, Zap, Shield, Globe, Clock, Users } from 'lucide-react';
 import QuickShareForm from '@/components/QuickShareForm';
 const LandingPage = () => {
-  return <div className="min-h-screen bg-background">
+  return <div className="min-h-screen bg-background px-[64px]">
       <UnifiedHeader />
       
       <main className="container mx-auto py-12 px-[48px]">
