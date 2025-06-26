@@ -23,7 +23,7 @@ Free, secure, and privacy-focused.</p>
           
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Button asChild size="lg" className="text-lg px-8">
-              <Link to="/auth">Get Started Free</Link>
+              <Link to="/auth">Get started for free 🚀</Link>
             </Button>
             <Button variant="outline" size="lg" className="text-lg px-8" asChild>
               <Link to="#features">Learn More</Link>
