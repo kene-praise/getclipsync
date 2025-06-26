@@ -221,6 +221,22 @@ export type Database = {
         Args: Record<PropertyKey, never>
         Returns: Json
       }
+      get_clip_analytics: {
+        Args: { period_days?: number }
+        Returns: Json
+      }
+      get_content_type_distribution: {
+        Args: Record<PropertyKey, never>
+        Returns: Json
+      }
+      get_privacy_compliant_admin_stats: {
+        Args: Record<PropertyKey, never>
+        Returns: Json
+      }
+      get_signup_analytics: {
+        Args: { period_days?: number }
+        Returns: Json
+      }
       is_admin: {
         Args: { user_email: string }
         Returns: boolean

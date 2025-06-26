@@ -1,130 +1,163 @@
 
-import { useState } from 'react';
-import SiteHeader from '@/components/SiteHeader';
+import UnifiedHeader from '@/components/UnifiedHeader';
 import Footer from '@/components/Footer';
-import QuickShareForm from '@/components/QuickShareForm';
+import { Button } from '@/components/ui/button';
+import { Link } from 'react-router-dom';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { CheckCircle } from 'lucide-react';
-import ReceiveClipPanel from '@/components/ReceiveClipPanel';
+import { Share2, Zap, Shield, Globe, Clock, Users } from 'lucide-react';
+import QuickShareForm from '@/components/QuickShareForm';
 
 const LandingPage = () => {
-  const [activeTab, setActiveTab] = useState('share');
-
   return (
-    <div className="flex flex-col min-h-screen">
-      <SiteHeader />
-      <main className="flex-1">
-        <section className="relative text-center py-20 md:py-28 overflow-hidden">
-          <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-[200%] max-w-[1400px] h-[80%] z-0 bg-[radial-gradient(ellipse_at_bottom,theme(colors.glow/0.15),transparent_50%)]" />
+    <div className="min-h-screen bg-background">
+      <UnifiedHeader />
+      
+      <main className="container mx-auto px-4 py-12">
+        {/* Hero Section */}
+        <section className="text-center space-y-8 py-20">
+          <div className="space-y-4">
+            <h1 className="text-5xl font-bold tracking-tight">
+              Sync Your Clipboard
+              <span className="text-primary block">Across All Devices</span>
+            </h1>
+            <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
+              Seamlessly share text and files between your devices. Free, secure, and privacy-focused.
+            </p>
+          </div>
           
-          <div className="relative z-10 container mx-auto px-4">
-            <div className="max-w-3xl mx-auto">
-              <h1 className="text-4xl md:text-5xl font-bold tracking-tight">Seamlessly sync<br />your clipboard</h1>
-              <p className="mt-4 text-lg text-muted-foreground max-w-2xl mx-auto">
-                Instantly share text, links, or files between devices with a simple code. No account needed for a quick share.
-              </p>
-            </div>
-            
-            <div className="mt-12 max-w-lg mx-auto">
-              <div className="flex justify-center mb-4">
-                <div className="inline-flex h-10 items-center justify-center rounded-md bg-muted p-1 text-muted-foreground">
-                  <button
-                    onClick={() => setActiveTab('share')}
-                    className={`inline-flex items-center justify-center whitespace-nowrap rounded-sm px-3 py-1.5 text-sm font-medium ring-offset-background transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 ${
-                      activeTab === 'share' ? 'bg-background text-foreground shadow-sm' : ''
-                    }`}
-                  >
-                    Share
-                  </button>
-                  <button
-                    onClick={() => setActiveTab('receive')}
-                    className={`inline-flex items-center justify-center whitespace-nowrap rounded-sm px-3 py-1.5 text-sm font-medium ring-offset-background transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 ${
-                      activeTab === 'receive' ? 'bg-background text-foreground shadow-sm' : ''
-                    }`}
-                  >
-                    Receive
-                  </button>
-                </div>
-              </div>
-
-              <div className={activeTab === 'share' ? 'block' : 'hidden'}>
-                <QuickShareForm />
-              </div>
-              <div className={activeTab === 'receive' ? 'block' : 'hidden'}>
-                <ReceiveClipPanel />
-              </div>
-            </div>
+          <div className="flex flex-col sm:flex-row gap-4 justify-center">
+            <Button asChild size="lg" className="text-lg px-8">
+              <Link to="/auth">Get Started Free</Link>
+            </Button>
+            <Button variant="outline" size="lg" className="text-lg px-8" asChild>
+              <Link to="#features">Learn More</Link>
+            </Button>
           </div>
         </section>
 
-        <div className="container mx-auto px-4 py-16 md:py-24">
-          <div className="max-w-5xl mx-auto">
-            <section>
-              <h2 className="text-3xl font-bold tracking-tight text-center">How It Works</h2>
-              <div className="mt-8 grid gap-8 md:grid-cols-2">
-                  <Card>
-                      <CardHeader>
-                          <CardTitle>Quick Share (No Account)</CardTitle>
-                      </CardHeader>
-                      <CardContent>
-                          <ol className="list-decimal list-inside space-y-2 text-muted-foreground">
-                              <li>Paste any text or upload a file.</li>
-                              <li>Click "Generate Share Link".</li>
-                              <li>Share the generated code or link.</li>
-                              <li>Content expires automatically in 1 hour.</li>
-                          </ol>
-                      </CardContent>
-                  </Card>
-                  <Card>
-                      <CardHeader>
-                          <CardTitle>Signed-in Users</CardTitle>
-                      </CardHeader>
-                      <CardContent>
-                          <ol className="list-decimal list-inside space-y-2 text-muted-foreground">
-                              <li>Sign up for a free account.</li>
-                              <li>Your clipboard history is saved securely.</li>
-                              <li>Access your clips from any device.</li>
-                              <li>Enable auto-sync to capture clipboard on the fly.</li>
-                              <li>Your content is kept for 30 days.</li>
-                          </ol>
-                      </CardContent>
-                  </Card>
-              </div>
-            </section>
-
-            <section className="mt-24 text-center">
-                <h2 className="text-3xl font-bold tracking-tight">Why Sign Up?</h2>
-                <p className="mt-2 text-lg text-muted-foreground">Unlock powerful features by creating a free account.</p>
-                <div className="mt-8 grid gap-8 md:grid-cols-3">
-                    <Card>
-                        <CardHeader>
-                            <CardTitle className="flex items-center gap-2"><CheckCircle className="text-primary h-5 w-5" /> Sync History</CardTitle>
-                        </CardHeader>
-                        <CardContent>
-                            <p className="text-muted-foreground">Keep a complete history of all your synced clips, accessible from any device.</p>
-                        </CardContent>
-                    </Card>
-                    <Card>
-                        <CardHeader>
-                            <CardTitle className="flex items-center gap-2"><CheckCircle className="text-primary h-5 w-5" /> Auto-Sync</CardTitle>
-                        </CardHeader>
-                        <CardContent>
-                            <p className="text-muted-foreground">Automatically sync your clipboard content when you focus on the app page.</p>
-                        </CardContent>
-                    </Card>
-                    <Card>
-                        <CardHeader>
-                            <CardTitle className="flex items-center gap-2"><CheckCircle className="text-primary h-5 w-5" /> Longer Retention</CardTitle>
-                        </CardHeader>
-                        <CardContent>
-                            <p className="text-muted-foreground">Your clips are saved for 30 days, much longer than the 1 hour for quick shares.</p>
-                        </CardContent>
-                    </Card>
-                </div>
-            </section>
+        {/* Quick Share Section */}
+        <section className="py-12">
+          <div className="text-center space-y-4 mb-8">
+            <h2 className="text-3xl font-bold">Try It Now</h2>
+            <p className="text-muted-foreground">
+              Share content instantly without creating an account
+            </p>
           </div>
-        </div>
+          <div className="max-w-md mx-auto">
+            <QuickShareForm />
+          </div>
+        </section>
+
+        {/* Features Section */}
+        <section id="features" className="py-20">
+          <div className="text-center space-y-4 mb-12">
+            <h2 className="text-3xl font-bold">Why Choose ClipSync?</h2>
+            <p className="text-muted-foreground max-w-2xl mx-auto">
+              Built with privacy and simplicity in mind, ClipSync makes cross-device sharing effortless.
+            </p>
+          </div>
+          
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Share2 className="h-5 w-5 text-primary" />
+                  Instant Sync
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-muted-foreground">
+                  Copy on one device, paste on another. Your clipboard syncs instantly across all your devices.
+                </p>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Shield className="h-5 w-5 text-primary" />
+                  Privacy First
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-muted-foreground">
+                  End-to-end encryption ensures your data stays private. Auto-deletion keeps your information secure.
+                </p>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Zap className="h-5 w-5 text-primary" />
+                  Completely Free
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-muted-foreground">
+                  No subscriptions, no hidden fees. ClipSync is free for everyone, forever.
+                </p>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Globe className="h-5 w-5 text-primary" />
+                  Universal Access
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-muted-foreground">
+                  Works on any device with a web browser. No app downloads required.
+                </p>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Clock className="h-5 w-5 text-primary" />
+                  Quick Sharing
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-muted-foreground">
+                  Share content instantly with generated codes. Perfect for temporary sharing.
+                </p>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Users className="h-5 w-5 text-primary" />
+                  Easy to Use
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-muted-foreground">
+                  Simple, intuitive interface. Start syncing in seconds, no technical knowledge required.
+                </p>
+              </CardContent>
+            </Card>
+          </div>
+        </section>
+
+        {/* CTA Section */}
+        <section className="py-20 text-center">
+          <div className="space-y-6">
+            <h2 className="text-3xl font-bold">Ready to Start Syncing?</h2>
+            <p className="text-muted-foreground max-w-md mx-auto">
+              Join thousands of users who trust ClipSync for secure, instant cross-device sharing.
+            </p>
+            <Button asChild size="lg" className="text-lg px-8">
+              <Link to="/auth">Sign Up Free</Link>
+            </Button>
+          </div>
+        </section>
       </main>
+      
       <Footer />
     </div>
   );
