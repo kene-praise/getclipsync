@@ -34,9 +34,9 @@ const AdminAnalyticsCharts = () => {
   const { data: rawContentTypeData, isLoading: contentTypeLoading } = useContentTypeDistribution();
 
   // Type guards and data transformation
-  const signupData: SignupData[] = Array.isArray(rawSignupData) ? rawSignupData as SignupData[] : [];
-  const clipData: ClipData[] = Array.isArray(rawClipData) ? rawClipData as ClipData[] : [];
-  const contentTypeData: ContentTypeData[] = Array.isArray(rawContentTypeData) ? rawContentTypeData as ContentTypeData[] : [];
+  const signupData: SignupData[] = Array.isArray(rawSignupData) ? rawSignupData as unknown as SignupData[] : [];
+  const clipData: ClipData[] = Array.isArray(rawClipData) ? rawClipData as unknown as ClipData[] : [];
+  const contentTypeData: ContentTypeData[] = Array.isArray(rawContentTypeData) ? rawContentTypeData as unknown as ContentTypeData[] : [];
 
   const chartConfig = {
     signups: {
