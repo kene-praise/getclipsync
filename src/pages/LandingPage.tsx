@@ -1,4 +1,3 @@
-
 import UnifiedHeader from '@/components/UnifiedHeader';
 import Footer from '@/components/Footer';
 import { Button } from '@/components/ui/button';
@@ -6,10 +5,8 @@ import { Link } from 'react-router-dom';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Share2, Zap, Shield, Globe, Clock, Users } from 'lucide-react';
 import QuickShareForm from '@/components/QuickShareForm';
-
 const LandingPage = () => {
-  return (
-    <div className="min-h-screen bg-background">
+  return <div className="min-h-screen bg-background">
       <UnifiedHeader />
       
       <main className="container mx-auto px-4 py-12">
@@ -148,9 +145,7 @@ const LandingPage = () => {
         <section className="py-20 text-center">
           <div className="space-y-6">
             <h2 className="text-3xl font-bold">Ready to Start Syncing?</h2>
-            <p className="text-muted-foreground max-w-md mx-auto">
-              Join thousands of users who trust ClipSync for secure, instant cross-device sharing.
-            </p>
+            <p className="text-muted-foreground max-w-md mx-auto">Be among the first 1,000 users who trust ClipSync for secure, instant cross-device sharing.</p>
             <Button asChild size="lg" className="text-lg px-8">
               <Link to="/auth">Sign Up Free</Link>
             </Button>
@@ -159,8 +154,6 @@ const LandingPage = () => {
       </main>
       
       <Footer />
-    </div>
-  );
+    </div>;
 };
-
 export default LandingPage;
