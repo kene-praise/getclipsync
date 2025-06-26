@@ -9,7 +9,7 @@ const LandingPage = () => {
   return <div className="min-h-screen bg-background">
       <UnifiedHeader />
       
-      <main className="container mx-auto px-4 py-12">
+      <main className="container mx-auto py-12 px-[48px]">
         {/* Hero Section */}
         <section className="text-center space-y-8 py-20">
           <div className="space-y-4">
