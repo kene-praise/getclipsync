@@ -144,9 +144,9 @@ Free, secure, and privacy-focused.</p>
         <section className="py-20 text-center">
           <div className="space-y-6">
             <h2 className="text-3xl font-bold">Ready to Start Syncing?</h2>
-            <p className="text-muted-foreground max-w-md mx-auto">Be among the first 1,000 users who trust ClipSync for secure, instant cross-device sharing.</p>
+            <p className="text-muted-foreground max-w-md mx-auto">Be among the first 1,000 users   who trust ClipSync for secure, instant cross-device sharing. 🚀</p>
             <Button asChild size="lg" className="text-lg px-8">
-              <Link to="/auth">Sign Up Free</Link>
+              <Link to="/auth">Sign up for free</Link>
             </Button>
           </div>
         </section>
