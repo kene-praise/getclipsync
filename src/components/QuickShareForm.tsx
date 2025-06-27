@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { useMutation } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
@@ -124,7 +123,7 @@ const QuickShareForm = () => {
 
   if (sharedClip) {
     return (
-        <Card className="animate-fade-in bg-secondary/20 backdrop-blur-md border border-white/10">
+        <Card className="animate-fade-in border border-white/20 bg-background/40 backdrop-blur-sm">
             <CardHeader className="text-center">
                 <CardTitle>Share This Clip!</CardTitle>
                 <CardDescription>Share this code or link. It will expire in 1 hour.</CardDescription>
@@ -138,8 +137,8 @@ const QuickShareForm = () => {
                     </div>
                 </div>
                 <div className="w-full flex items-center space-x-2">
-                    <Input value={sharedClip.url} readOnly />
-                    <Button variant="outline" size="icon" onClick={handleCopy}>
+                    <Input value={sharedClip.url} readOnly className="border-white/20 bg-background/20" />
+                    <Button variant="outline" size="icon" onClick={handleCopy} className="border-white/20 bg-background/20">
                         {copied ? <Check className="h-4 w-4" /> : <ClipboardCopy className="h-4 w-4" />}
                     </Button>
                 </div>
@@ -152,7 +151,7 @@ const QuickShareForm = () => {
   }
 
   return (
-    <Card className="bg-secondary/20 backdrop-blur-md border border-white/10">
+    <Card className="border border-white/20 bg-background/40 backdrop-blur-sm">
         <CardHeader>
             <CardTitle>Quick Share</CardTitle>
             <CardDescription>Share text or a file instantly. No account needed.</CardDescription>
@@ -165,13 +164,13 @@ const QuickShareForm = () => {
                     onChange={(e) => setTextContent(e.target.value)}
                     rows={4}
                     disabled={mutation.isPending}
-                    className="bg-input/70 placeholder:text-muted-foreground/80 focus:bg-input/80 transition-colors"
+                    className="border-white/20 bg-background/20 placeholder:text-muted-foreground/80"
                 />
                  {file ? (
                     <AttachedFilePreview file={file} onClearFile={clearFile} isPending={mutation.isPending} />
                 ) : (
                     <div className="relative">
-                        <Button type="button" variant="outline" className="w-full bg-input/70 hover:bg-input/80 transition-colors" disabled={mutation.isPending}>
+                        <Button type="button" variant="outline" className="w-full border-white/20 bg-background/20" disabled={mutation.isPending}>
                             <FileUp className="mr-2 h-4 w-4" />
                             Attach a file (max 5MB)
                         </Button>

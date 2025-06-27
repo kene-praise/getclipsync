@@ -28,7 +28,7 @@ const AdminPage = () => {
   // Show access denied if not admin
   if (!isAdmin) {
     return (
-      <div className="min-h-screen bg-background">
+      <div className="min-h-screen bg-background px-4 md:px-10 lg:px-16">
         <UnifiedHeader />
         <div className="flex items-center justify-center py-20">
           <div className="text-center space-y-4">
@@ -48,9 +48,9 @@ const AdminPage = () => {
   }
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-background px-4 md:px-10 lg:px-16">
       <UnifiedHeader />
-      <main className="container mx-auto px-4 py-8">
+      <main className="container mx-auto py-8">
         <AdminDashboard />
       </main>
       <Footer />

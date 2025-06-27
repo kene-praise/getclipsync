@@ -22,7 +22,7 @@ const ReceiveClipPanel = () => {
     };
 
     return (
-        <Card className="bg-secondary/20 backdrop-blur-md border border-white/10">
+        <Card className="border border-white/20 bg-background/40 backdrop-blur-sm">
             <CardHeader>
                 <CardTitle>Receive Clip</CardTitle>
                 <CardDescription>Enter a code to view a shared clip.</CardDescription>
@@ -34,7 +34,7 @@ const ReceiveClipPanel = () => {
                         value={code}
                         onChange={(e) => setCode(e.target.value.toUpperCase())}
                         maxLength={6}
-                        className="bg-input/70 placeholder:text-muted-foreground/80 focus:bg-input/80 transition-colors text-center tracking-widest font-mono uppercase"
+                        className="border-white/20 bg-background/20 placeholder:text-muted-foreground/80 text-center tracking-widest font-mono uppercase"
                     />
                     <Button type="submit" className="w-full">
                         <Search className="mr-2 h-4 w-4" />
