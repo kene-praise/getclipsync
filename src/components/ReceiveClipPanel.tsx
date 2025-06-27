@@ -1,4 +1,5 @@
 
+
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Input } from '@/components/ui/input';
@@ -22,7 +23,7 @@ const ReceiveClipPanel = () => {
     };
 
     return (
-        <Card className="border border-white/20 bg-background/40 backdrop-blur-sm">
+        <Card>
             <CardHeader>
                 <CardTitle>Receive Clip</CardTitle>
                 <CardDescription>Enter a code to view a shared clip.</CardDescription>
@@ -47,3 +48,4 @@ const ReceiveClipPanel = () => {
 };
 
 export default ReceiveClipPanel;
+

@@ -9,6 +9,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Loader2, FileUp, Share2, ClipboardCopy, Check } from 'lucide-react';
 import { QRCodeSVG as QRCode } from 'qrcode.react';
 import AttachedFilePreview from './AttachedFilePreview';
+
 const generateCode = (length = 6) => {
   const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
   let result = '';
@@ -17,6 +18,7 @@ const generateCode = (length = 6) => {
   }
   return result;
 };
+
 const QuickShareForm = () => {
   const [textContent, setTextContent] = useState('');
   const [file, setFile] = useState<File | null>(null);
@@ -25,6 +27,7 @@ const QuickShareForm = () => {
     url: string;
   } | null>(null);
   const [copied, setCopied] = useState(false);
+
   useEffect(() => {
     const pasteFromClipboard = async () => {
       // Only paste if there's no text and no file, and the window is focused.
@@ -126,8 +129,9 @@ const QuickShareForm = () => {
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
   };
+
   if (sharedClip) {
-    return <Card className="animate-fade-in border border-white/20 bg-background/40 backdrop-blur-sm">
+    return <Card className="animate-fade-in">
             <CardHeader className="text-center">
                 <CardTitle>Share This Clip!</CardTitle>
                 <CardDescription>Share this code or link. It will expire in 1 hour.</CardDescription>
@@ -152,7 +156,7 @@ const QuickShareForm = () => {
             </CardContent>
         </Card>;
   }
-  return <Card className="border border-white/20 bg-background/40 backdrop-blur-sm">
+  return <Card>
         <CardHeader>
             <CardTitle>Try Quick Share Now</CardTitle>
             <CardDescription>Share text or a file instantly. No account needed.</CardDescription>
@@ -176,4 +180,5 @@ const QuickShareForm = () => {
         </CardContent>
     </Card>;
 };
+
 export default QuickShareForm;
