@@ -1,12 +1,9 @@
-
 import UnifiedHeader from '@/components/UnifiedHeader';
 import Footer from '@/components/Footer';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { FileText, AlertTriangle, Shield, Users, Gavel } from 'lucide-react';
-
 const TermsPage = () => {
-  return (
-    <div className="min-h-screen bg-background">
+  return <div className="min-h-screen bg-background">
       <UnifiedHeader />
       <main className="container mx-auto px-4 py-12 max-w-4xl">
         <div className="space-y-8">
@@ -161,19 +158,14 @@ const TermsPage = () => {
                 <CardTitle>Contact Information</CardTitle>
               </CardHeader>
               <CardContent>
-                <p>For questions about these Terms and Conditions:</p>
-                <div className="mt-4 space-y-1">
-                  <p><strong>Email:</strong> legal@clipsync.com</p>
-                  <p><strong>Response Time:</strong> Within 72 hours</p>
-                </div>
+                <p>For questions about these Terms and Conditions contact us via email</p>
+                
               </CardContent>
             </Card>
           </div>
         </div>
       </main>
       <Footer />
-    </div>
-  );
+    </div>;
 };
-
 export default TermsPage;
