@@ -144,7 +144,7 @@ const LandingPage = () => {
         <section className="py-16 md:py-20 text-center">
           <div className="space-y-4 md:space-y-6">
             <h2 className="text-2xl md:text-3xl font-bold">Ready to Start Syncing?</h2>
-            <p className="text-sm md:text-base text-muted-foreground max-w-md mx-auto">Be among the first 1,000 users 👩‍💻👨‍💻 who trust ClipSync for secure, instant cross-device clipboard synchronization. </p>
+            <p className="text-sm md:text-base text-muted-foreground max-w-md mx-auto">Save your place among the first 1,000 users 👩‍💻👨‍💻 who trust ClipSync for secure, instant cross-device clipboard synchronization. </p>
             <Button asChild size="lg" className="text-base md:text-lg px-6 md:px-8">
               <Link to="/auth">Sign up for free</Link>
             </Button>
