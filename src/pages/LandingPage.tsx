@@ -1,4 +1,3 @@
-
 import UnifiedHeader from '@/components/UnifiedHeader';
 import Footer from '@/components/Footer';
 import BlueGlowBackground from '@/components/BlueGlowBackground';
@@ -7,10 +6,8 @@ import { Link } from 'react-router-dom';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Share2, Zap, Shield, Globe, Clock, Users } from 'lucide-react';
 import QuickShareTabs from '@/components/QuickShareTabs';
-
 const LandingPage = () => {
-  return (
-    <div className="min-h-screen bg-background px-4 md:px-10 lg:px-16">
+  return <div className="min-h-screen bg-background px-4 md:px-10 lg:px-16">
       <UnifiedHeader />
       
       <main className="container mx-auto py-8 md:py-12">
@@ -25,10 +22,7 @@ const LandingPage = () => {
                   Sync Your Clipboard
                   <span className="text-primary block">Across All Devices</span>
                 </h1>
-                <p className="text-lg md:text-xl text-muted-foreground max-w-2xl lg:max-w-none">
-                  Transfer text from phone to PC, sync clipboard between Android, iPhone, Windows, Mac. 
-                  Free, secure, and privacy-focused cross-device clipboard synchronization.
-                </p>
+                <p className="text-lg md:text-xl text-muted-foreground max-w-2xl lg:max-w-none">Get free, secure, and privacy-focused cross-device clipboard synchronization. Transfer text from phone to PC or between Android, iPhone, Windows, Mac. </p>
               </div>
               
               <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start">
@@ -41,10 +35,8 @@ const LandingPage = () => {
             {/* Quick Share Tabs */}
             <div className="w-full max-w-md mx-auto lg:max-w-none">
               <div className="text-center space-y-4 mb-6 lg:mb-8">
-                <h2 className="text-2xl md:text-3xl font-bold">Try It Now</h2>
-                <p className="text-sm md:text-base text-muted-foreground">
-                  Share content instantly without creating an account
-                </p>
+                
+                
               </div>
               <QuickShareTabs />
             </div>
@@ -163,8 +155,6 @@ const LandingPage = () => {
       </main>
       
       <Footer />
-    </div>
-  );
+    </div>;
 };
-
 export default LandingPage;
