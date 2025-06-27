@@ -1,12 +1,9 @@
-
 import UnifiedHeader from '@/components/UnifiedHeader';
 import Footer from '@/components/Footer';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Shield, Eye, Database, Trash2, Download, Lock } from 'lucide-react';
-
 const PrivacyPolicyPage = () => {
-  return (
-    <div className="min-h-screen bg-background">
+  return <div className="min-h-screen bg-background">
       <UnifiedHeader />
       <main className="container mx-auto px-4 py-12 max-w-4xl">
         <div className="space-y-8">
@@ -117,9 +114,7 @@ const PrivacyPolicyPage = () => {
                   <li><strong>Portability:</strong> Receive your data in a machine-readable format</li>
                   <li><strong>Objection:</strong> Object to processing of your personal data</li>
                 </ul>
-                <p className="text-sm text-muted-foreground">
-                  To exercise these rights, contact us at privacy@clipsync.com
-                </p>
+                <p className="text-sm text-muted-foreground">To exercise these rights, contact us at praiseofumaduadike@gmail.com</p>
               </CardContent>
             </Card>
 
@@ -128,10 +123,10 @@ const PrivacyPolicyPage = () => {
                 <CardTitle>Contact Information</CardTitle>
               </CardHeader>
               <CardContent>
-                <p>If you have questions about this Privacy Policy, please contact us:</p>
+                <p>If you have questions about this Privacy Policy, please contact us: praiseofumaduadike@gmail.com</p>
                 <div className="mt-4 space-y-1">
-                  <p><strong>Email:</strong> privacy@clipsync.com</p>
-                  <p><strong>Response Time:</strong> Within 72 hours</p>
+                  
+                  
                 </div>
               </CardContent>
             </Card>
@@ -139,8 +134,6 @@ const PrivacyPolicyPage = () => {
         </div>
       </main>
       <Footer />
-    </div>
-  );
+    </div>;
 };
-
 export default PrivacyPolicyPage;
