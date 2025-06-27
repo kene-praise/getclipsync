@@ -157,7 +157,7 @@ const QuickShareForm = () => {
             <CardTitle>Try Quick Share Now</CardTitle>
             <CardDescription>Share text or a file instantly. No account needed.</CardDescription>
         </CardHeader>
-        <CardContent>
+        <CardContent className="bg-transparent">
             <form onSubmit={handleSubmit} className="space-y-4">
                 <Textarea placeholder="Paste your text or link here..." value={textContent} onChange={e => setTextContent(e.target.value)} rows={4} disabled={mutation.isPending} className="border-white/20 bg-background/20 placeholder:text-muted-foreground/80" />
                  {file ? <AttachedFilePreview file={file} onClearFile={clearFile} isPending={mutation.isPending} /> : <div className="relative">

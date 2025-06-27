@@ -7,12 +7,12 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Share2, Zap, Shield, Globe, Clock, Users } from 'lucide-react';
 import QuickShareTabs from '@/components/QuickShareTabs';
 const LandingPage = () => {
-  return <div className="min-h-screen bg-background px-4 md:px-10 lg:px-16">
+  return <div className="min-h-screen px-4 lg:px-16 md:px-[40px] bg-transparent">
       <UnifiedHeader />
       
       <main className="container mx-auto py-8 md:py-12">
         {/* Hero Section - Side by side on web */}
-        <section className="py-12 md:py-16 lg:py-20 relative">
+        <section className="py-12 md:py-16 lg:py-20 relative rounded-3xl">
           <BlueGlowBackground />
           <div className="grid lg:grid-cols-2 gap-8 lg:gap-12 items-center">
             {/* Hero Content */}
