@@ -1,10 +1,7 @@
-
 import { Link } from 'react-router-dom';
 import { Share2 } from 'lucide-react';
-
 const Footer = () => {
-  return (
-    <footer className="border-t bg-background">
+  return <footer className="border-t bg-background">
       <div className="container mx-auto px-4 py-8">
         <div className="flex flex-col md:flex-row items-center justify-between gap-6">
           <div className="flex items-center gap-2">
@@ -22,9 +19,7 @@ const Footer = () => {
             <Link to="/auth" className="text-muted-foreground hover:text-foreground transition-colors">
               Sign Up
             </Link>
-            <Link to="/#features" className="text-muted-foreground hover:text-foreground transition-colors">
-              Features
-            </Link>
+            
           </div>
         </div>
         
@@ -32,8 +27,6 @@ const Footer = () => {
           <p>© 2025 ClipSync. Made with ❤️ for secure sharing. Contact: <a href="mailto:praiseofumaduadike@gmail.com" className="text-primary hover:underline">praiseofumaduadike@gmail.com</a></p>
         </div>
       </div>
-    </footer>
-  );
+    </footer>;
 };
-
 export default Footer;
