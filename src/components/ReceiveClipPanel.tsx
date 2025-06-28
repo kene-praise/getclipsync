@@ -32,7 +32,7 @@ const ReceiveClipPanel = () => {
                 </CardDescription>
             </CardHeader>
             <CardContent className={isMobile ? "p-4 pt-0" : "p-6 pt-0"}>
-                <form onSubmit={handleSubm​it} className="space-y-4">
+                <form onSubmit={handleSubmit} className="space-y-4">
                     <Input
                         placeholder="e.g. ABCXYZ"
                         value={code}
