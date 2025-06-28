@@ -4,11 +4,14 @@ import { Button } from '@/components/ui/button';
 import { Share2, LogOut, User } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useAdminCheck } from '@/hooks/useAdminCheck';
+import { useResponsive } from '@/hooks/useResponsive';
+import MobileNavMenu from '@/components/MobileNavMenu';
 
 const UnifiedHeader = () => {
   const { user, signOut } = useAuth();
   const { data: isAdmin } = useAdminCheck();
   const location = useLocation();
+  const { isMobile } = useResponsive();
 
   const getContextualNavigation = () => {
     if (!user) return null;
@@ -47,9 +50,11 @@ const UnifiedHeader = () => {
         <div className="flex items-center justify-between rounded-full bg-secondary/40 backdrop-blur-lg border border-secondary py-2 pl-4 pr-2">
           <Link to="/" className="flex items-center gap-2 font-bold text-xl">
             <Share2 className="h-6 w-6 text-primary" />
-            <span>ClipSync</span>
+            <span className={isMobile ? "hidden sm:block" : ""}>ClipSync</span>
           </Link>
-          <nav className="flex items-center gap-3">
+          
+          {/* Desktop Navigation */}
+          <nav className="hidden md:flex items-center gap-3">
             {user ? (
               <div className="flex items-center gap-3">
                 {getContextualNavigation()}
@@ -60,7 +65,7 @@ const UnifiedHeader = () => {
                 )}
                 <div className="flex items-center gap-2 px-3 py-1 bg-primary/10 rounded-full border border-primary/20">
                   <User className="h-4 w-4 text-primary" />
-                  <span className="text-sm font-medium text-primary">{user.email}</span>
+                  <span className="text-sm font-medium text-primary max-w-[120px] truncate">{user.email}</span>
                 </div>
                 <Button variant="outline" onClick={signOut} className="rounded-full">
                   <LogOut className="mr-2 h-4 w-4" />
@@ -78,6 +83,9 @@ const UnifiedHeader = () => {
               </div>
             )}
           </nav>
+          
+          {/* Mobile Navigation */}
+          <MobileNavMenu />
         </div>
       </div>
     </header>
