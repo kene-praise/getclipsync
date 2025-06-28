@@ -7,7 +7,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Share2, Zap, Shield, Globe, Clock, Users } from 'lucide-react';
 import QuickShareTabs from '@/components/QuickShareTabs';
 const LandingPage = () => {
-  return <div className="min-h-screen lg:px-16 md:px-[40px] bg-transparent px-0">
+  return <div className="min-h-screen lg:px-16 md:px-[40px] bg-transparent px-[16px]">
       <UnifiedHeader />
       
       <main className="container mx-auto py-8 md:py-12">
