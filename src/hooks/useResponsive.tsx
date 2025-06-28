@@ -10,8 +10,9 @@ export const useResponsive = () => {
     const checkScreenSize = () => {
       const width = window.innerWidth;
       setScreenWidth(width);
-      setIsMobile(width < 768);
-      setIsTablet(width >= 768 && width < 1024);
+      // iPhone 11 Pro is 375px wide, so we need to catch screens up to 768px as mobile
+      setIsMobile(width <= 768);
+      setIsTablet(width > 768 && width < 1024);
     };
 
     checkScreenSize();

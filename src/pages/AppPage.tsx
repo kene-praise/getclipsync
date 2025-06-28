@@ -16,15 +16,13 @@ const AppPage = () => {
         className="absolute inset-0 -z-10 h-full w-full bg-background bg-[linear-gradient(to_right,#8080800a_1px,transparent_1px),linear-gradient(to_bottom,#8080800a_1px,transparent_1px)] bg-[size:14px_24px] [mask-image:radial-gradient(ellipse_60%_50%_at_50%_0%,#000_70%,transparent_100%)]"
       ></div>
       <UnifiedHeader />
-      <main className={`flex-grow container mx-auto flex flex-col items-center justify-center pt-20 pb-10 ${
-        isMobile ? 'px-4' : 'px-4'
-      }`}>
+      <main className={`flex-grow container mx-auto flex flex-col items-center justify-center pt-20 pb-10 px-4`}>
         <div className={`w-full space-y-6 ${isMobile ? 'max-w-sm' : 'max-w-md'}`}>
           <div className="text-center space-y-2">
-            <h1 className={`font-bold animate-fade-in ${isMobile ? 'text-xl' : 'text-2xl'}`}>
+            <h1 className={`font-bold animate-fade-in ${isMobile ? 'text-lg' : 'text-2xl'}`}>
               Welcome to ClipSync
             </h1>
-            <p className={`text-muted-foreground ${isMobile ? 'text-sm' : 'text-base'}`}>
+            <p className={`text-muted-foreground ${isMobile ? 'text-xs' : 'text-base'}`}>
               Sync your clipboard across all devices
             </p>
             {user && (
