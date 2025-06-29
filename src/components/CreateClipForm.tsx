@@ -51,8 +51,14 @@ const CreateClipForm = () => {
     });
     
     if (validFiles.length > 0) {
-        setFiles(validFiles);
+        // Add to existing files instead of replacing
+        setFiles(prevFiles => [...prevFiles, ...validFiles]);
         setText('');
+        
+        // Reset the input so the same files can be selected again if needed
+        if (fileInputRef.current) {
+          fileInputRef.current.value = '';
+        }
     }
   }
   
@@ -72,6 +78,10 @@ const CreateClipForm = () => {
 
   const removeFile = (index: number) => {
     setFiles(files.filter((_, i) => i !== index));
+    // Reset file input when removing files
+    if (fileInputRef.current) {
+      fileInputRef.current.value = '';
+    }
   };
 
   return (
@@ -105,7 +115,7 @@ const CreateClipForm = () => {
           <div className="space-y-2">
             {files.map((file, index) => (
               <AttachedFilePreview
-                key={`${file.name}-${index}`}
+                key={`${file.name}-${index}-${file.lastModified}`}
                 file={file}
                 onClearFile={() => removeFile(index)}
                 isPending={createClipMutation.isPending}

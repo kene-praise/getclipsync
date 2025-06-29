@@ -32,11 +32,14 @@ const ClipFormActions: React.FC<ClipFormActionsProps> = ({
           disabled={isPending}
           ref={fileInputRef}
           multiple={multiple}
+          accept="*/*"
         />
         <Button asChild variant="ghost" size="sm" disabled={isPending}>
           <label htmlFor="file-upload" className="cursor-pointer flex items-center gap-2 text-muted-foreground hover:text-foreground">
             <Paperclip className="h-4 w-4" />
-            <span className="text-sm font-medium">Attach files (max 25MB each)</span>
+            <span className="text-sm font-medium">
+              {multiple ? 'Add files (max 25MB each)' : 'Attach file (max 25MB)'}
+            </span>
           </label>
         </Button>
       </div>
