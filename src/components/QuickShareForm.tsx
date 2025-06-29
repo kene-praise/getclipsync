@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { useMutation } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
@@ -10,7 +9,6 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Loader2, FileUp, Share2, ClipboardCopy, Check } from 'lucide-react';
 import { QRCodeSVG as QRCode } from 'qrcode.react';
 import AttachedFilePreview from './AttachedFilePreview';
-
 const generateCode = (length = 6) => {
   const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
   let result = '';
@@ -19,7 +17,6 @@ const generateCode = (length = 6) => {
   }
   return result;
 };
-
 const QuickShareForm = () => {
   const [textContent, setTextContent] = useState('');
   const [files, setFiles] = useState<File[]>([]);
@@ -28,7 +25,6 @@ const QuickShareForm = () => {
     url: string;
   } | null>(null);
   const [copied, setCopied] = useState(false);
-
   useEffect(() => {
     const pasteFromClipboard = async () => {
       // Only paste if there's no text and no files, and the window is focused.
@@ -57,7 +53,7 @@ const QuickShareForm = () => {
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const selectedFiles = e.target.files ? Array.from(e.target.files) : [];
-    
+
     // Validate file sizes (25MB limit)
     const maxSize = 25 * 1024 * 1024; // 25MB in bytes
     const validFiles = selectedFiles.filter(file => {
@@ -67,20 +63,17 @@ const QuickShareForm = () => {
       }
       return true;
     });
-    
     if (validFiles.length > 0) {
       // Add to existing files instead of replacing
       setFiles(prevFiles => [...prevFiles, ...validFiles]);
-      
+
       // Reset the input so the same files can be selected again if needed
       e.target.value = '';
     }
   };
-
   const removeFile = (index: number) => {
     setFiles(files.filter((_, i) => i !== index));
   };
-
   const createTemporaryClip = async ({
     textContent,
     files
@@ -90,10 +83,9 @@ const QuickShareForm = () => {
   }) => {
     const code = generateCode();
     let file_url = null;
-    
+
     // For now, handle only the first file (similar to CreateClipForm)
     const file = files.length > 0 ? files[0] : null;
-    
     if (file) {
       const filePath = `${Date.now()}_${file.name}`;
       const {
@@ -121,7 +113,6 @@ const QuickShareForm = () => {
       url: `${window.location.origin}/share/${code}`
     };
   };
-
   const mutation = useMutation({
     mutationFn: createTemporaryClip,
     onSuccess: data => {
@@ -132,7 +123,6 @@ const QuickShareForm = () => {
       toast.error(`Failed to share clip: ${error.message}`);
     }
   });
-
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!textContent && files.length === 0) {
@@ -144,14 +134,12 @@ const QuickShareForm = () => {
       files
     });
   };
-
   const handleCopy = () => {
     if (!sharedClip) return;
     navigator.clipboard.writeText(sharedClip.url);
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
   };
-
   if (sharedClip) {
     return <Card className="animate-fade-in">
             <CardHeader className="text-center">
@@ -173,58 +161,34 @@ const QuickShareForm = () => {
                     </Button>
                 </div>
                 <Button onClick={() => {
-                  setSharedClip(null);
-                  setTextContent('');
-                  setFiles([]);
-                }} className="w-full">
+          setSharedClip(null);
+          setTextContent('');
+          setFiles([]);
+        }} className="w-full">
                     Share Another Clip
                 </Button>
             </CardContent>
         </Card>;
   }
-
   return <Card>
         <CardHeader>
-            <CardTitle>Try Quick Share Now</CardTitle>
+            <CardTitle className="text-xl">Try Quick Share Now</CardTitle>
             <CardDescription>Share text or files instantly. No account needed.</CardDescription>
         </CardHeader>
         <CardContent className="bg-transparent">
             <form onSubmit={handleSubmit} className="space-y-4">
-                <Textarea 
-                  placeholder="Paste your text or link here..." 
-                  value={textContent} 
-                  onChange={e => setTextContent(e.target.value)} 
-                  rows={4} 
-                  disabled={mutation.isPending} 
-                  className="border-white/20 bg-background/20 placeholder:text-muted-foreground/80" 
-                />
+                <Textarea placeholder="Paste your text or link here..." value={textContent} onChange={e => setTextContent(e.target.value)} rows={4} disabled={mutation.isPending} className="border-white/20 bg-background/20 placeholder:text-muted-foreground/80" />
                 
-                {files.length > 0 && (
-                  <div className="space-y-2">
-                    {files.map((file, index) => (
-                      <AttachedFilePreview
-                        key={`${file.name}-${index}-${file.lastModified}`}
-                        file={file}
-                        onClearFile={() => removeFile(index)}
-                        isPending={mutation.isPending}
-                      />
-                    ))}
-                  </div>
-                )}
+                {files.length > 0 && <div className="space-y-2">
+                    {files.map((file, index) => <AttachedFilePreview key={`${file.name}-${index}-${file.lastModified}`} file={file} onClearFile={() => removeFile(index)} isPending={mutation.isPending} />)}
+                  </div>}
 
                 <div className="relative">
                   <Button type="button" variant="outline" className="w-full border-white/20 bg-background/20" disabled={mutation.isPending}>
                     <FileUp className="mr-2 h-4 w-4" />
                     Add files (max 25MB each)
                   </Button>
-                  <Input 
-                    type="file" 
-                    className="absolute inset-0 w-full h-full opacity-0 cursor-pointer" 
-                    onChange={handleFileChange} 
-                    disabled={mutation.isPending}
-                    multiple
-                    accept="*/*"
-                  />
+                  <Input type="file" className="absolute inset-0 w-full h-full opacity-0 cursor-pointer" onChange={handleFileChange} disabled={mutation.isPending} multiple accept="*/*" />
                 </div>
 
                 <Button type="submit" className="w-full" disabled={mutation.isPending}>
@@ -236,5 +200,4 @@ const QuickShareForm = () => {
         </CardContent>
     </Card>;
 };
-
 export default QuickShareForm;
