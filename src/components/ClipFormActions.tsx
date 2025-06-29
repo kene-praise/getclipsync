@@ -10,9 +10,17 @@ interface ClipFormActionsProps {
   isPending: boolean;
   hasContent: boolean;
   fileInputRef: React.RefObject<HTMLInputElement>;
+  multiple?: boolean;
 }
 
-const ClipFormActions: React.FC<ClipFormActionsProps> = ({ onSend, onFileChange, isPending, hasContent, fileInputRef }) => {
+const ClipFormActions: React.FC<ClipFormActionsProps> = ({ 
+  onSend, 
+  onFileChange, 
+  isPending, 
+  hasContent, 
+  fileInputRef,
+  multiple = false 
+}) => {
   return (
     <div className="flex items-center justify-between border-t border-input bg-muted/30 p-2 px-3">
       <div>
@@ -23,11 +31,12 @@ const ClipFormActions: React.FC<ClipFormActionsProps> = ({ onSend, onFileChange,
           onChange={onFileChange}
           disabled={isPending}
           ref={fileInputRef}
+          multiple={multiple}
         />
         <Button asChild variant="ghost" size="sm" disabled={isPending}>
           <label htmlFor="file-upload" className="cursor-pointer flex items-center gap-2 text-muted-foreground hover:text-foreground">
             <Paperclip className="h-4 w-4" />
-            <span className="text-sm font-medium">Attach a file</span>
+            <span className="text-sm font-medium">Attach files (max 25MB each)</span>
           </label>
         </Button>
       </div>

@@ -11,7 +11,7 @@ import AutoSyncToggle from './AutoSyncToggle';
 
 const CreateClipForm = () => {
   const [text, setText] = useState('');
-  const [file, setFile] = useState<File | null>(null);
+  const [files, setFiles] = useState<File[]>([]);
   const [autoSyncOnFocus, setAutoSyncOnFocus] = useState(true);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const createClipMutation = useCreateClip();
@@ -20,23 +20,38 @@ const CreateClipForm = () => {
     createClipMutation,
     autoSyncOnFocus,
     text,
-    file,
+    file: files.length > 0 ? files[0] : null,
   });
 
   const handleSend = () => {
-    createClipMutation.mutate({ text, file }, {
+    // For now, we'll handle the first file. In a full implementation, 
+    // you'd need to update useCreateClip to handle multiple files
+    const fileToSend = files.length > 0 ? files[0] : null;
+    
+    createClipMutation.mutate({ text, file: fileToSend }, {
         onSuccess: () => {
           toast.success("Your clip has been synced!");
           setText('');
-          handleClearFile();
+          handleClearFiles();
         },
     });
   };
   
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const selectedFile = e.target.files ? e.target.files[0] : null;
-    if (selectedFile) {
-        setFile(selectedFile);
+    const selectedFiles = e.target.files ? Array.from(e.target.files) : [];
+    
+    // Validate file sizes (25MB limit)
+    const maxSize = 25 * 1024 * 1024; // 25MB in bytes
+    const validFiles = selectedFiles.filter(file => {
+      if (file.size > maxSize) {
+        toast.error(`File "${file.name}" exceeds 25MB limit`);
+        return false;
+      }
+      return true;
+    });
+    
+    if (validFiles.length > 0) {
+        setFiles(validFiles);
         setText('');
     }
   }
@@ -44,15 +59,19 @@ const CreateClipForm = () => {
   const handleTextChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     setText(e.target.value);
     if (e.target.value) {
-        handleClearFile();
+        handleClearFiles();
     }
   }
 
-  const handleClearFile = () => {
-    setFile(null);
+  const handleClearFiles = () => {
+    setFiles([]);
     if (fileInputRef.current) {
         fileInputRef.current.value = '';
     }
+  };
+
+  const removeFile = (index: number) => {
+    setFiles(files.filter((_, i) => i !== index));
   };
 
   return (
@@ -60,7 +79,7 @@ const CreateClipForm = () => {
       <div className="text-center">
         <h2 className="text-2xl font-semibold tracking-tight">Sync your clipboard</h2>
         <p className="text-sm text-muted-foreground">
-          Paste text or upload a file to sync it across your devices.
+          Paste text or upload files to sync them across your devices.
         </p>
       </div>
       <div className="space-y-4">
@@ -76,17 +95,23 @@ const CreateClipForm = () => {
             onSend={handleSend}
             onFileChange={handleFileChange}
             isPending={createClipMutation.isPending}
-            hasContent={!!text || !!file}
+            hasContent={!!text || files.length > 0}
             fileInputRef={fileInputRef}
+            multiple={true}
           />
         </div>
 
-        {file && (
-          <AttachedFilePreview
-            file={file}
-            onClearFile={handleClearFile}
-            isPending={createClipMutation.isPending}
-          />
+        {files.length > 0 && (
+          <div className="space-y-2">
+            {files.map((file, index) => (
+              <AttachedFilePreview
+                key={`${file.name}-${index}`}
+                file={file}
+                onClearFile={() => removeFile(index)}
+                isPending={createClipMutation.isPending}
+              />
+            ))}
+          </div>
         )}
 
         <AutoSyncToggle 

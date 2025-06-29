@@ -4,15 +4,20 @@ import { useState, useEffect } from 'react';
 export const useResponsive = () => {
   const [isMobile, setIsMobile] = useState(false);
   const [isTablet, setIsTablet] = useState(false);
+  const [isWeb, setIsWeb] = useState(false);
   const [screenWidth, setScreenWidth] = useState(0);
 
   useEffect(() => {
     const checkScreenSize = () => {
       const width = window.innerWidth;
       setScreenWidth(width);
-      // iPhone 11 Pro is 375px wide, so we need to catch screens up to 768px as mobile
+      
+      // Mobile: up to 768px
       setIsMobile(width <= 768);
-      setIsTablet(width > 768 && width < 1024);
+      // Tablet: 769px to 1024px
+      setIsTablet(width > 768 && width <= 1024);
+      // Web: above 1024px
+      setIsWeb(width > 1024);
     };
 
     checkScreenSize();
@@ -20,5 +25,5 @@ export const useResponsive = () => {
     return () => window.removeEventListener('resize', checkScreenSize);
   }, []);
 
-  return { isMobile, isTablet, screenWidth };
+  return { isMobile, isTablet, isWeb, screenWidth };
 };

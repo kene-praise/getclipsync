@@ -57,9 +57,9 @@ const QuickShareForm = () => {
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
       const selectedFile = e.target.files[0];
-      if (selectedFile.size > 5 * 1024 * 1024) {
-        // 5MB limit
-        toast.error('File size cannot exceed 5MB.');
+      if (selectedFile.size > 25 * 1024 * 1024) {
+        // 25MB limit
+        toast.error('File size cannot exceed 25MB.');
         return;
       }
       setFile(selectedFile);
@@ -167,7 +167,7 @@ const QuickShareForm = () => {
                  {file ? <AttachedFilePreview file={file} onClearFile={clearFile} isPending={mutation.isPending} /> : <div className="relative">
                         <Button type="button" variant="outline" className="w-full border-white/20 bg-background/20" disabled={mutation.isPending}>
                             <FileUp className="mr-2 h-4 w-4" />
-                            Attach a file (max 5MB)
+                            Attach a file (max 25MB)
                         </Button>
                         <Input type="file" className="absolute inset-0 w-full h-full opacity-0 cursor-pointer" onChange={handleFileChange} disabled={mutation.isPending} />
                     </div>}
