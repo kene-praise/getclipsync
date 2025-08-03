@@ -1,30 +1,18 @@
 import { useEffect } from 'react';
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Loader2, Trash2, FileText, Download, Clipboard } from 'lucide-react';
+import { Loader2, Trash2, FileText, Download, Clipboard, File } from 'lucide-react';
 import { toast } from 'sonner';
+import { useClips, type Clip } from '@/hooks/useClips';
 
 const ClipList = () => {
   const { user } = useAuth();
   const queryClient = useQueryClient();
 
-  const { data: clips, isLoading } = useQuery({
-    queryKey: ['clips', user?.id],
-    queryFn: async () => {
-      if (!user) return [];
-      const { data, error } = await supabase
-        .from('clips')
-        .select('*')
-        .eq('user_id', user.id) // Explicitly filter for the current user's clips
-        .order('created_at', { ascending: false });
-      if (error) throw new Error(error.message);
-      return data;
-    },
-    enabled: !!user,
-  });
+  const { data: clips, isLoading } = useClips();
 
   useEffect(() => {
     if (!user) return;
@@ -58,14 +46,24 @@ const ClipList = () => {
 
   const deleteMutation = useMutation({
     mutationFn: async (clipId: string) => {
-      // First, delete the associated file from storage if it exists
+      // First, delete associated files from storage if they exist
       const clipToDelete = clips?.find(c => c.id === clipId);
-      if (clipToDelete?.file_path) {
-        const { error: storageError } = await supabase.storage.from('clip_files').remove([clipToDelete.file_path]);
+      if (clipToDelete?.files && clipToDelete.files.length > 0) {
+        const filePaths = clipToDelete.files.map(f => f.file_path);
+        const { error: storageError } = await supabase.storage.from('clip_files').remove(filePaths);
         if (storageError) {
           // Log error but proceed to delete DB record, as it's the source of truth
-          console.error('Failed to delete file from storage:', storageError.message);
+          console.error('Failed to delete files from storage:', storageError.message);
         }
+      }
+
+      // Delete file records from database
+      const { error: fileDeleteError } = await supabase
+        .from('clip_files')
+        .delete()
+        .eq('clip_id', clipId);
+      if (fileDeleteError) {
+        console.error('Failed to delete file records:', fileDeleteError.message);
       }
 
       // Then, delete the clip record from the database
@@ -109,6 +107,93 @@ const ClipList = () => {
     }
   };
 
+  const renderClipContent = (clip: Clip) => {
+    if (clip.content_type === 'text') {
+      return (
+        <div className="flex items-center gap-4 overflow-hidden">
+          <FileText className="h-6 w-6 text-primary flex-shrink-0" />
+          <div className="truncate">
+            <p className="font-medium truncate">{clip.text_content}</p>
+            <p className="text-xs text-muted-foreground">
+              {new Date(clip.created_at).toLocaleString()}
+            </p>
+          </div>
+        </div>
+      );
+    }
+
+    if (clip.content_type === 'file' && clip.files && clip.files.length > 0) {
+      return (
+        <div className="flex items-center gap-4 overflow-hidden">
+          <File className="h-6 w-6 text-primary flex-shrink-0" />
+          <div className="truncate">
+            <p className="font-medium truncate">
+              {clip.files.length === 1 
+                ? clip.files[0].file_name 
+                : `${clip.files.length} files`}
+            </p>
+            <p className="text-xs text-muted-foreground">
+              {new Date(clip.created_at).toLocaleString()}
+            </p>
+          </div>
+        </div>
+      );
+    }
+
+    if (clip.content_type === 'mixed') {
+      return (
+        <div className="flex items-center gap-4 overflow-hidden">
+          <FileText className="h-6 w-6 text-primary flex-shrink-0" />
+          <div className="truncate">
+            <p className="font-medium truncate">{clip.text_content}</p>
+            <p className="text-xs text-muted-foreground">
+              {clip.files && clip.files.length > 0 && `+ ${clip.files.length} file${clip.files.length > 1 ? 's' : ''} • `}
+              {new Date(clip.created_at).toLocaleString()}
+            </p>
+          </div>
+        </div>
+      );
+    }
+
+    return null;
+  };
+
+  const renderClipActions = (clip: Clip) => {
+    return (
+      <div className="flex items-center flex-shrink-0 gap-2">
+        {(clip.content_type === 'text' || clip.content_type === 'mixed') && clip.text_content && (
+          <Button variant="ghost" size="icon" onClick={() => copyToClipboard(clip.text_content!)} title="Copy text">
+            <Clipboard className="h-5 w-5" />
+          </Button>
+        )}
+        {clip.files && clip.files.length > 0 && (
+          <>
+            {clip.files.map((file, index) => (
+              <Button 
+                key={file.id}
+                variant="ghost" 
+                size="icon" 
+                onClick={() => handleDownload(file.file_path, file.file_name)} 
+                title={`Download ${file.file_name}`}
+              >
+                <Download className="h-5 w-5" />
+              </Button>
+            ))}
+          </>
+        )}
+        <Button
+          variant="ghost"
+          size="icon"
+          onClick={() => deleteMutation.mutate(clip.id)}
+          disabled={deleteMutation.isPending}
+          title="Delete clip"
+        >
+          <Trash2 className="h-5 w-5 text-destructive" />
+        </Button>
+      </div>
+    );
+  };
+
   if (isLoading) {
     return (
       <div className="flex justify-center items-center py-10">
@@ -135,42 +220,8 @@ const ClipList = () => {
       {clips.map((clip) => (
         <Card key={clip.id}>
           <CardContent className="p-4 flex items-center justify-between gap-4">
-            <div className="flex items-center gap-4 overflow-hidden">
-              {clip.content_type === 'text' ? (
-                <FileText className="h-6 w-6 text-primary flex-shrink-0" />
-              ) : (
-                <Download className="h-6 w-6 text-primary flex-shrink-0" />
-              )}
-              <div className="truncate">
-                <p className="font-medium truncate">
-                  {clip.content_type === 'text' ? clip.text_content : clip.file_name}
-                </p>
-                <p className="text-xs text-muted-foreground">
-                  {new Date(clip.created_at).toLocaleString()}
-                </p>
-              </div>
-            </div>
-            <div className="flex items-center flex-shrink-0 gap-2">
-              {clip.content_type === 'text' && clip.text_content && (
-                <Button variant="ghost" size="icon" onClick={() => copyToClipboard(clip.text_content!)} title="Copy text">
-                  <Clipboard className="h-5 w-5" />
-                </Button>
-              )}
-              {clip.content_type === 'file' && clip.file_path && clip.file_name && (
-                <Button variant="ghost" size="icon" onClick={() => handleDownload(clip.file_path!, clip.file_name!)} title="Download file">
-                  <Download className="h-5 w-5" />
-                </Button>
-              )}
-              <Button
-                variant="ghost"
-                size="icon"
-                onClick={() => deleteMutation.mutate(clip.id)}
-                disabled={deleteMutation.isPending}
-                title="Delete clip"
-              >
-                <Trash2 className="h-5 w-5 text-destructive" />
-              </Button>
-            </div>
+            {renderClipContent(clip)}
+            {renderClipActions(clip)}
           </CardContent>
         </Card>
       ))}

@@ -24,11 +24,13 @@ const CreateClipForm = () => {
   });
 
   const handleSend = () => {
-    // For now, we'll handle the first file. In a full implementation, 
-    // you'd need to update useCreateClip to handle multiple files
-    const fileToSend = files.length > 0 ? files[0] : null;
+    // Validate file count (max 10 files)
+    if (files.length > 10) {
+      toast.error("Maximum 10 files allowed per clip");
+      return;
+    }
     
-    createClipMutation.mutate({ text, file: fileToSend }, {
+    createClipMutation.mutate({ text, files }, {
         onSuccess: () => {
           toast.success("Your clip has been synced!");
           setText('');
@@ -40,8 +42,15 @@ const CreateClipForm = () => {
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const selectedFiles = e.target.files ? Array.from(e.target.files) : [];
     
-    // Validate file sizes (25MB limit)
+    // Validate file sizes (25MB limit) and total count (10 files max)
     const maxSize = 25 * 1024 * 1024; // 25MB in bytes
+    const currentFileCount = files.length;
+    
+    if (currentFileCount + selectedFiles.length > 10) {
+      toast.error(`Maximum 10 files allowed. You can add ${10 - currentFileCount} more files.`);
+      return;
+    }
+    
     const validFiles = selectedFiles.filter(file => {
       if (file.size > maxSize) {
         toast.error(`File "${file.name}" exceeds 25MB limit`);

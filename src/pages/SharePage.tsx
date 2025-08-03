@@ -1,6 +1,4 @@
 import { useParams, Link } from 'react-router-dom';
-import { useQuery } from '@tanstack/react-query';
-import { supabase } from '@/integrations/supabase/client';
 import SiteHeader from '@/components/SiteHeader';
 import Footer from '@/components/Footer';
 import {
@@ -20,61 +18,87 @@ import {
   Download,
   Image as ImageIcon,
   ArrowLeft,
+  File,
 } from 'lucide-react';
 import { toast as sonnerToast } from 'sonner';
 import { useState } from 'react';
 import SharedFilePreview from '@/components/SharedFilePreview';
 import { useAuth } from '@/contexts/AuthContext';
-
-const fetchClip = async (code: string) => {
-  const { data, error } = await supabase
-    .from('temporary_clips')
-    .select('*')
-    .eq('code', code)
-    .single();
-
-  if (error) {
-    console.error('Error fetching clip:', error);
-    throw new Error('Failed to fetch clip');
-  }
-
-  return data;
-};
+import { useTemporaryClip, type TemporaryClip } from '@/hooks/useTemporaryClip';
 
 const SharePage = () => {
   const { code } = useParams<{ code: string }>();
   const [copied, setCopied] = useState(false);
   const { user } = useAuth();
 
-  const { data, isLoading, isError } = useQuery({
-    queryKey: ['sharedClip', code],
-    queryFn: () => fetchClip(code!),
-    enabled: !!code,
-    staleTime: 60 * 1000, // 1 minute
-  });
+  const { data, isLoading, isError } = useTemporaryClip(code || '');
 
   const handleCopyText = () => {
-    if (data?.content_type === 'text') {
-      navigator.clipboard.writeText(data.text_content || '');
+    if ((data?.content_type === 'text' || data?.content_type === 'mixed') && data?.text_content) {
+      navigator.clipboard.writeText(data.text_content);
       setCopied(true);
       sonnerToast.success('Text copied to clipboard!');
       setTimeout(() => setCopied(false), 2000);
     }
   };
 
-  const renderContent = () => {
-    if (data?.content_type === 'text') {
+  const renderContent = (data: TemporaryClip) => {
+    if (data.content_type === 'text' && data.text_content) {
       return <p className="break-words">{data.text_content}</p>;
     }
 
-    if (data?.content_type === 'file' && data?.file_url) {
-      const fileExtension = data.file_name?.split('.').pop() || '';
-      const isImage = ['jpg', 'jpeg', 'png', 'gif'].includes(
-        fileExtension.toLowerCase()
-      );
-
+    if (data.content_type === 'file' && data.files && data.files.length > 0) {
       return (
-        <SharedFilePreview fileUrl={data.file_url} isImage={isImage} fileName={data.file_name} />
+        <div className="space-y-4">
+          {data.files.map((file) => {
+            const fileExtension = file.file_name.split('.').pop() || '';
+            const isImage = ['jpg', 'jpeg', 'png', 'gif', 'webp'].includes(
+              fileExtension.toLowerCase()
+            );
+            return (
+              <SharedFilePreview 
+                key={file.id}
+                fileUrl={file.file_url} 
+                isImage={isImage} 
+                fileName={file.file_name} 
+              />
+            );
+          })}
+        </div>
+      );
+    }
+
+    if (data.content_type === 'mixed') {
+      return (
+        <div className="space-y-4">
+          {data.text_content && (
+            <div>
+              <h4 className="font-medium mb-2">Text Content:</h4>
+              <p className="break-words">{data.text_content}</p>
+            </div>
+          )}
+          {data.files && data.files.length > 0 && (
+            <div>
+              <h4 className="font-medium mb-2">Files ({data.files.length}):</h4>
+              <div className="space-y-2">
+                {data.files.map((file) => {
+                  const fileExtension = file.file_name.split('.').pop() || '';
+                  const isImage = ['jpg', 'jpeg', 'png', 'gif', 'webp'].includes(
+                    fileExtension.toLowerCase()
+                  );
+                  return (
+                    <SharedFilePreview 
+                      key={file.id}
+                      fileUrl={file.file_url} 
+                      isImage={isImage} 
+                      fileName={file.file_name} 
+                    />
+                  );
+                })}
+              </div>
+            </div>
+          )}
+        </div>
       );
     }
 
@@ -113,9 +137,9 @@ const SharePage = () => {
                     creation.
                   </CardDescription>
                 </CardHeader>
-                <CardContent>{renderContent()}</CardContent>
+                <CardContent>{renderContent(data)}</CardContent>
                 <CardFooter className="flex justify-end gap-2">
-                  {data.content_type === 'text' && (
+                  {(data.content_type === 'text' || data.content_type === 'mixed') && data.text_content && (
                     <Button
                       variant="outline"
                       size="sm"
@@ -131,16 +155,22 @@ const SharePage = () => {
                       </span>
                     </Button>
                   )}
-                  {data.content_type === 'file' && data.file_url && (
-                    <Button variant="outline" size="sm" asChild>
-                      <a
-                        href={data.file_url}
-                        download={data.file_name || 'download'}
-                      >
-                        <Download className="h-4 w-4" />
-                        <span className="ml-2">Download File</span>
-                      </a>
-                    </Button>
+                  {data.files && data.files.length > 0 && (
+                    <>
+                      {data.files.map((file) => (
+                        <Button key={file.id} variant="outline" size="sm" asChild>
+                          <a
+                            href={file.file_url}
+                            download={file.file_name}
+                          >
+                            <Download className="h-4 w-4" />
+                            <span className="ml-2">
+                              {data.files!.length === 1 ? 'Download File' : file.file_name}
+                            </span>
+                          </a>
+                        </Button>
+                      ))}
+                    </>
                   )}
                 </CardFooter>
               </Card>

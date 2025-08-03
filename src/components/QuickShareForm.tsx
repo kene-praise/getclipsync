@@ -54,6 +54,13 @@ const QuickShareForm = () => {
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const selectedFiles = e.target.files ? Array.from(e.target.files) : [];
 
+    // Validate file count (max 10 files)
+    const currentFileCount = files.length;
+    if (currentFileCount + selectedFiles.length > 10) {
+      toast.error(`Maximum 10 files allowed. You can add ${10 - currentFileCount} more files.`);
+      return;
+    }
+
     // Validate file sizes (25MB limit)
     const maxSize = 25 * 1024 * 1024; // 25MB in bytes
     const validFiles = selectedFiles.filter(file => {
@@ -82,32 +89,68 @@ const QuickShareForm = () => {
     files: File[];
   }) => {
     const code = generateCode();
-    let file_url = null;
+    
+    let contentType = 'text';
+    let hasFiles = false;
 
-    // For now, handle only the first file (similar to CreateClipForm)
-    const file = files.length > 0 ? files[0] : null;
-    if (file) {
-      const filePath = `${Date.now()}_${file.name}`;
-      const {
-        data: uploadData,
-        error: uploadError
-      } = await supabase.storage.from('temporary_clips').upload(filePath, file);
-      if (uploadError) throw uploadError;
-      const {
-        data: urlData
-      } = supabase.storage.from('temporary_clips').getPublicUrl(uploadData.path);
-      file_url = urlData.publicUrl;
+    // Determine content type
+    if (textContent && files.length > 0) {
+      contentType = 'mixed';
+      hasFiles = true;
+    } else if (files.length > 0) {
+      contentType = 'file';
+      hasFiles = true;
+    } else if (!textContent) {
+      throw new Error('Either text or files must be provided');
     }
-    const {
-      error: insertError
-    } = await supabase.from('temporary_clips').insert({
-      code,
-      text_content: textContent || null,
-      file_url,
-      file_name: file?.name || null,
-      content_type: file ? 'file' : 'text'
-    });
-    if (insertError) throw insertError;
+
+    // Insert temporary clip into database first
+    const { data: clipData, error: clipError } = await supabase
+      .from('temporary_clips')
+      .insert({
+        code,
+        text_content: textContent || null,
+        content_type: contentType,
+        has_files: hasFiles,
+      })
+      .select()
+      .single();
+
+    if (clipError) throw clipError;
+
+    // Upload files and create file records
+    if (files.length > 0) {
+      for (const file of files) {
+        const fileExt = file.name.split('.').pop();
+        const uniqueFileName = `${code}_${Date.now()}_${Math.random().toString(36).substring(2)}.${fileExt}`;
+
+        // Upload file to storage
+        const { error: uploadError } = await supabase.storage
+          .from('temporary_clips')
+          .upload(uniqueFileName, file);
+
+        if (uploadError) throw uploadError;
+
+        // Get public URL
+        const { data: { publicUrl } } = supabase.storage
+          .from('temporary_clips')
+          .getPublicUrl(uniqueFileName);
+
+        // Create file record
+        const { error: fileError } = await supabase
+          .from('temporary_clip_files')
+          .insert({
+            temporary_clip_id: clipData.id,
+            file_name: file.name,
+            file_url: publicUrl,
+            file_size: file.size,
+            content_type: file.type,
+          });
+
+        if (fileError) throw fileError;
+      }
+    }
+
     return {
       code,
       url: `${window.location.origin}/share/${code}`
@@ -127,6 +170,10 @@ const QuickShareForm = () => {
     e.preventDefault();
     if (!textContent && files.length === 0) {
       toast.error('Please enter some text or attach files to share.');
+      return;
+    }
+    if (files.length > 10) {
+      toast.error("Maximum 10 files allowed per share");
       return;
     }
     mutation.mutate({
@@ -186,7 +233,7 @@ const QuickShareForm = () => {
                 <div className="relative">
                   <Button type="button" variant="outline" className="w-full border-white/20 bg-background/20" disabled={mutation.isPending}>
                     <FileUp className="mr-2 h-4 w-4" />
-                    Add files (max 25MB each)
+                    Add files (max 10 files, 25MB each)
                   </Button>
                   <Input type="file" className="absolute inset-0 w-full h-full opacity-0 cursor-pointer" onChange={handleFileChange} disabled={mutation.isPending} multiple accept="*/*" />
                 </div>

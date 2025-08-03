@@ -5,7 +5,7 @@ import { toast } from 'sonner';
 import { useAuth } from '@/contexts/AuthContext';
 
 interface UseClipboardAutoSyncProps {
-  createClipMutation: UseMutationResult<void, Error, { text: string; file: File | null; }, unknown>;
+  createClipMutation: UseMutationResult<void, any, { text: string; files: File[]; }, unknown>;
   autoSyncOnFocus: boolean;
   text: string;
   file: File | null;
@@ -32,7 +32,7 @@ export const useClipboardAutoSync = ({
             const latestClipText = clips?.[0]?.text_content;
 
             if (latestClipText?.trim() !== clipboardText.trim()) {
-              createClipMutation.mutate({ text: clipboardText, file: null }, {
+              createClipMutation.mutate({ text: clipboardText, files: [] }, {
                 onSuccess: () => {
                   toast.info("Auto-synced from clipboard.");
                 }

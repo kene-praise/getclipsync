@@ -38,7 +38,7 @@ const ClipFormActions: React.FC<ClipFormActionsProps> = ({
           <label htmlFor="file-upload" className="cursor-pointer flex items-center gap-2 text-muted-foreground hover:text-foreground">
             <Paperclip className="h-4 w-4" />
             <span className="text-sm font-medium">
-              {multiple ? 'Add files (max 25MB each)' : 'Attach file (max 25MB)'}
+              {multiple ? 'Add files (max 10 files, 25MB each)' : 'Attach file (max 25MB)'}
             </span>
           </label>
         </Button>

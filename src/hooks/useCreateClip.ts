@@ -11,48 +11,83 @@ export const useCreateClip = () => {
   const { trackEvent } = useAnalytics();
 
   return useMutation({
-    mutationFn: async ({ text, file }: { text: string; file: File | null }) => {
+    mutationFn: async ({ text, files }: { text: string; files: File[] }) => {
       if (!user) throw new Error("You must be logged in to create a clip.");
-      if (!text && !file) throw new Error("Nothing to send");
+      if (!text && files.length === 0) throw new Error("Nothing to send");
 
-      if (file) {
-        const filePath = `${user.id}/${Date.now()}_${file.name}`;
-        const { error: uploadError } = await supabase.storage
-          .from('clip_files')
-          .upload(filePath, file);
-        if (uploadError) throw uploadError;
+      let contentType = 'text';
+      let hasFiles = false;
 
-        const { error: dbError } = await supabase.from('clips').insert({
-          content_type: 'file',
-          file_name: file.name,
-          file_path: filePath,
+      // Determine content type
+      if (text && files.length > 0) {
+        contentType = 'mixed';
+        hasFiles = true;
+      } else if (files.length > 0) {
+        contentType = 'file';
+        hasFiles = true;
+      }
+
+      // Insert clip into database first
+      const { data: clipData, error: clipError } = await supabase
+        .from('clips')
+        .insert({
           user_id: user.id,
-        });
-        if (dbError) throw dbError;
+          text_content: text || null,
+          content_type: contentType,
+          has_files: hasFiles,
+        })
+        .select()
+        .single();
 
-        // Track analytics
+      if (clipError) throw clipError;
+
+      // Upload files and create file records
+      if (files.length > 0) {
+        for (const file of files) {
+          const fileExt = file.name.split('.').pop();
+          const uniqueFileName = `${Date.now()}_${Math.random().toString(36).substring(2)}.${fileExt}`;
+          const filePath = `${user.id}/${uniqueFileName}`;
+
+          // Upload file to storage
+          const { error: uploadError } = await supabase.storage
+            .from('clip_files')
+            .upload(filePath, file);
+
+          if (uploadError) throw uploadError;
+
+          // Create file record
+          const { error: fileError } = await supabase
+            .from('clip_files')
+            .insert({
+              clip_id: clipData.id,
+              file_name: file.name,
+              file_path: filePath,
+              file_size: file.size,
+              content_type: file.type,
+            });
+
+          if (fileError) throw fileError;
+        }
+
+        // Track analytics for files
         trackEvent({ 
-          eventType: 'file_uploaded', 
+          eventType: 'files_uploaded', 
           eventData: { 
-            fileName: file.name, 
-            fileSize: file.size,
-            contentType: file.type 
+            fileCount: files.length,
+            totalSize: files.reduce((sum, f) => sum + f.size, 0),
+            fileTypes: files.map(f => f.type)
           } 
         });
-      } else if (text) {
-        const { error: dbError } = await supabase.from('clips').insert({
-          content_type: 'text',
-          text_content: text,
-          user_id: user.id,
-        });
-        if (dbError) throw dbError;
+      }
 
-        // Track analytics
+      if (text) {
+        // Track analytics for text
         trackEvent({ 
           eventType: 'clip_created', 
           eventData: { 
             textLength: text.length,
-            contentType: 'text' 
+            contentType: contentType,
+            hasFiles: hasFiles
           } 
         });
       }
