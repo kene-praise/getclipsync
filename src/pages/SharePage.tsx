@@ -25,6 +25,7 @@ import { useState } from 'react';
 import SharedFilePreview from '@/components/SharedFilePreview';
 import { useAuth } from '@/contexts/AuthContext';
 import { useTemporaryClip, type TemporaryClip } from '@/hooks/useTemporaryClip';
+import { downloadAllAsZip } from '@/lib/download-all';
 
 const SharePage = () => {
   const { code } = useParams<{ code: string }>();
@@ -40,6 +41,20 @@ const SharePage = () => {
       sonnerToast.success('Text copied to clipboard!');
       setTimeout(() => setCopied(false), 2000);
     }
+  };
+
+  const handleDownloadAll = async () => {
+    if (!data?.files || data.files.length === 0) {
+      sonnerToast.error('No files to download');
+      return;
+    }
+
+    const filesToDownload = data.files.map(file => ({
+      url: file.file_url,
+      name: file.file_name
+    }));
+
+    await downloadAllAsZip(filesToDownload, `shared-${code}.zip`);
   };
 
   const renderContent = (data: TemporaryClip) => {
@@ -60,7 +75,15 @@ const SharePage = () => {
                 key={file.id}
                 fileUrl={file.file_url} 
                 isImage={isImage} 
-                fileName={file.file_name} 
+                fileName={file.file_name}
+                onDownload={() => {
+                  const link = document.createElement('a');
+                  link.href = `${file.file_url}?download=${encodeURIComponent(file.file_name)}`;
+                  link.download = file.file_name;
+                  document.body.appendChild(link);
+                  link.click();
+                  document.body.removeChild(link);
+                }}
               />
             );
           })}
@@ -91,7 +114,15 @@ const SharePage = () => {
                       key={file.id}
                       fileUrl={file.file_url} 
                       isImage={isImage} 
-                      fileName={file.file_name} 
+                      fileName={file.file_name}
+                      onDownload={() => {
+                        const link = document.createElement('a');
+                        link.href = `${file.file_url}?download=${encodeURIComponent(file.file_name)}`;
+                        link.download = file.file_name;
+                        document.body.appendChild(link);
+                        link.click();
+                        document.body.removeChild(link);
+                      }}
                     />
                   );
                 })}
@@ -155,22 +186,15 @@ const SharePage = () => {
                       </span>
                     </Button>
                   )}
-                  {data.files && data.files.length > 0 && (
-                    <>
-                      {data.files.map((file) => (
-                        <Button key={file.id} variant="outline" size="sm" asChild>
-                           <a
-                             href={`${file.file_url}?download=${encodeURIComponent(file.file_name)}`}
-                             download={file.file_name}
-                           >
-                            <Download className="h-4 w-4" />
-                            <span className="ml-2">
-                              {data.files!.length === 1 ? 'Download File' : file.file_name}
-                            </span>
-                          </a>
-                        </Button>
-                      ))}
-                    </>
+                  {data.files && data.files.length > 1 && (
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={handleDownloadAll}
+                    >
+                      <Download className="h-4 w-4" />
+                      <span className="ml-2">Download All</span>
+                    </Button>
                   )}
                 </CardFooter>
               </Card>

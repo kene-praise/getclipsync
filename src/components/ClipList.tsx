@@ -4,9 +4,10 @@ import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Loader2, Trash2, FileText, Download, Clipboard, File } from 'lucide-react';
+import { Loader2, Trash2, FileText, Download, Clipboard, File, FolderDown } from 'lucide-react';
 import { toast } from 'sonner';
 import { useClips, type Clip } from '@/hooks/useClips';
+import { downloadAllAsZip } from '@/lib/download-all';
 
 const ClipList = () => {
   const { user } = useAuth();
@@ -109,6 +110,45 @@ const ClipList = () => {
     }
   };
 
+  const handleDownloadAll = async (clip: Clip) => {
+    if (!clip.files || clip.files.length === 0) {
+      toast.error('No files to download');
+      return;
+    }
+
+    try {
+      const filesToDownload = await Promise.allSettled(
+        clip.files.map(async (file) => {
+          const { data, error } = await supabase.storage
+            .from('clip_files')
+            .createSignedUrl(file.file_path, 120);
+          
+          if (error) throw new Error(`Failed to get URL for ${file.file_name}`);
+          
+          return {
+            url: data.signedUrl,
+            name: file.file_name
+          };
+        })
+      );
+
+      const successful = filesToDownload
+        .filter((result): result is PromiseFulfilledResult<{ url: string; name: string }> => 
+          result.status === 'fulfilled')
+        .map(result => result.value);
+
+      if (successful.length === 0) {
+        toast.error('Failed to prepare files for download');
+        return;
+      }
+
+      await downloadAllAsZip(successful, `clip-${clip.id.slice(0, 8)}.zip`);
+    } catch (error) {
+      console.error('Error preparing download:', error);
+      toast.error('Failed to prepare files for download');
+    }
+  };
+
   const renderClipContent = (clip: Clip) => {
     if (clip.content_type === 'text') {
       return (
@@ -162,10 +202,21 @@ const ClipList = () => {
 
   const renderClipActions = (clip: Clip) => {
     return (
-      <div className="flex items-center flex-shrink-0 gap-2">
+      <div className="flex items-center flex-shrink-0 gap-2 flex-wrap">
         {(clip.content_type === 'text' || clip.content_type === 'mixed') && clip.text_content && (
           <Button variant="ghost" size="icon" onClick={() => copyToClipboard(clip.text_content!)} title="Copy text">
             <Clipboard className="h-5 w-5" />
+          </Button>
+        )}
+        {clip.files && clip.files.length > 1 && (
+          <Button 
+            variant="ghost" 
+            size="sm" 
+            onClick={() => handleDownloadAll(clip)} 
+            title="Download all files as zip"
+          >
+            <FolderDown className="h-4 w-4" />
+            <span className="ml-1 hidden sm:inline">Download All</span>
           </Button>
         )}
         {clip.files && clip.files.length > 0 && (
