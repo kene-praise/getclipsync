@@ -159,10 +159,10 @@ const SharePage = () => {
                     <>
                       {data.files.map((file) => (
                         <Button key={file.id} variant="outline" size="sm" asChild>
-                          <a
-                            href={file.file_url}
-                            download={file.file_name}
-                          >
+                           <a
+                             href={`${file.file_url}?download=${encodeURIComponent(file.file_name)}`}
+                             download={file.file_name}
+                           >
                             <Download className="h-4 w-4" />
                             <span className="ml-2">
                               {data.files!.length === 1 ? 'Download File' : file.file_name}

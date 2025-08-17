@@ -41,32 +41,55 @@ export const useCreateClip = () => {
 
       if (clipError) throw clipError;
 
-      // Upload files and create file records
+      // Upload files and create file records with parallel processing
       if (files.length > 0) {
-        for (const file of files) {
+        const fileUploadPromises = files.map(async (file) => {
           const fileExt = file.name.split('.').pop();
           const uniqueFileName = `${Date.now()}_${Math.random().toString(36).substring(2)}.${fileExt}`;
           const filePath = `${user.id}/${uniqueFileName}`;
 
-          // Upload file to storage
-          const { error: uploadError } = await supabase.storage
-            .from('clip_files')
-            .upload(filePath, file);
+          try {
+            // Upload file to storage
+            const { error: uploadError } = await supabase.storage
+              .from('clip_files')
+              .upload(filePath, file);
 
-          if (uploadError) throw uploadError;
+            if (uploadError) throw uploadError;
 
-          // Create file record
-          const { error: fileError } = await supabase
-            .from('clip_files')
-            .insert({
-              clip_id: clipData.id,
-              file_name: file.name,
-              file_path: filePath,
-              file_size: file.size,
-              content_type: file.type,
-            });
+            // Create file record
+            const { error: fileError } = await supabase
+              .from('clip_files')
+              .insert({
+                clip_id: clipData.id,
+                file_name: file.name,
+                file_path: filePath,
+                file_size: file.size,
+                content_type: file.type,
+              });
 
-          if (fileError) throw fileError;
+            if (fileError) throw fileError;
+            
+            return { success: true, fileName: file.name };
+          } catch (error) {
+            console.error(`Failed to upload ${file.name}:`, error);
+            return { success: false, fileName: file.name, error };
+          }
+        });
+
+        // Wait for all uploads to complete
+        const results = await Promise.allSettled(fileUploadPromises);
+        
+        // Count successful and failed uploads
+        const successful = results.filter(r => r.status === 'fulfilled' && r.value.success).length;
+        const failed = results.filter(r => r.status === 'fulfilled' && !r.value.success).length;
+        
+        // Show appropriate toasts for upload results
+        if (successful > 0 && failed === 0) {
+          toast.success(`Successfully uploaded ${successful} file${successful > 1 ? 's' : ''}`);
+        } else if (successful > 0 && failed > 0) {
+          toast.success(`Uploaded ${successful} file${successful > 1 ? 's' : ''}, ${failed} failed`);
+        } else if (failed > 0) {
+          toast.error(`Failed to upload ${failed} file${failed > 1 ? 's' : ''}`);
         }
 
         // Track analytics for files

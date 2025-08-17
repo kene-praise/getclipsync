@@ -88,7 +88,9 @@ const ClipList = () => {
     try {
       const { data, error } = await supabase.storage
         .from('clip_files')
-        .createSignedUrl(filePath, 60); // The link will be valid for 60 seconds
+        .createSignedUrl(filePath, 60, {
+          download: fileName
+        });
 
       if (error) throw error;
 
