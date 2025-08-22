@@ -27,35 +27,22 @@ export const useTemporaryClip = (code: string) => {
     queryFn: async () => {
       if (!code) throw new Error('Code is required');
 
-      // Fetch temporary clip
-      const { data: clip, error: clipError } = await supabase
-        .from('temporary_clips')
-        .select('*')
-        .eq('code', code)
-        .single();
+      // Use secure function to fetch clip by code
+      const { data, error } = await supabase.rpc('get_temporary_clip_by_code', {
+        p_code: code
+      });
 
-      if (clipError) {
-        console.error('Error fetching clip:', clipError);
+      if (error) {
+        console.error('Error fetching clip:', error);
         throw new Error('Failed to fetch clip');
       }
 
-      // Fetch files for the clip if it has files
-      if (clip.has_files) {
-        const { data: files, error: filesError } = await supabase
-          .from('temporary_clip_files')
-          .select('*')
-          .eq('temporary_clip_id', clip.id)
-          .order('created_at', { ascending: false });
-
-        if (filesError) {
-          console.error('Error fetching clip files:', filesError);
-          throw new Error('Failed to fetch clip files');
-        }
-
-        return { ...clip, files } as TemporaryClip;
+      if (!data) {
+        throw new Error('Clip not found or expired');
       }
 
-      return { ...clip, files: [] } as TemporaryClip;
+      // Parse the JSON response from the function
+      return data as unknown as TemporaryClip;
     },
     enabled: !!code,
     staleTime: 60 * 1000, // 1 minute

@@ -312,6 +312,10 @@ export type Database = {
         Args: { period_days?: number }
         Returns: Json
       }
+      get_temporary_clip_by_code: {
+        Args: { p_code: string }
+        Returns: Json
+      }
       is_admin: {
         Args: { user_email: string }
         Returns: boolean
