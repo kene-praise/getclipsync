@@ -280,6 +280,15 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      create_temporary_clip: {
+        Args: {
+          p_code: string
+          p_content_type: string
+          p_has_files: boolean
+          p_text_content: string
+        }
+        Returns: string
+      }
       current_user_is_admin: {
         Args: Record<PropertyKey, never>
         Returns: boolean

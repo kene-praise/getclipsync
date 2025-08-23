@@ -9,6 +9,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Loader2, FileUp, Share2, ClipboardCopy, Check } from 'lucide-react';
 import { QRCodeSVG as QRCode } from 'qrcode.react';
 import AttachedFilePreview from './AttachedFilePreview';
+
 const generateCode = (length = 6) => {
   const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
   let result = '';
@@ -17,6 +18,7 @@ const generateCode = (length = 6) => {
   }
   return result;
 };
+
 const QuickShareForm = () => {
   const [textContent, setTextContent] = useState('');
   const [files, setFiles] = useState<File[]>([]);
@@ -25,6 +27,7 @@ const QuickShareForm = () => {
     url: string;
   } | null>(null);
   const [copied, setCopied] = useState(false);
+
   useEffect(() => {
     const pasteFromClipboard = async () => {
       // Only paste if there's no text and no files, and the window is focused.
@@ -70,6 +73,7 @@ const QuickShareForm = () => {
       }
       return true;
     });
+
     if (validFiles.length > 0) {
       // Add to existing files instead of replacing
       setFiles(prevFiles => [...prevFiles, ...validFiles]);
@@ -78,9 +82,11 @@ const QuickShareForm = () => {
       e.target.value = '';
     }
   };
+
   const removeFile = (index: number) => {
     setFiles(files.filter((_, i) => i !== index));
   };
+
   const createTemporaryClip = async ({
     textContent,
     files
@@ -104,17 +110,13 @@ const QuickShareForm = () => {
       throw new Error('Either text or files must be provided');
     }
 
-    // Insert temporary clip into database first
-    const { data: clipData, error: clipError } = await supabase
-      .from('temporary_clips')
-      .insert({
-        code,
-        text_content: textContent || null,
-        content_type: contentType,
-        has_files: hasFiles,
-      })
-      .select()
-      .single();
+    // Use the new RPC function to create temporary clip
+    const { data: clipId, error: clipError } = await supabase.rpc('create_temporary_clip', {
+      p_code: code,
+      p_text_content: textContent || null,
+      p_content_type: contentType,
+      p_has_files: hasFiles,
+    });
 
     if (clipError) throw clipError;
 
@@ -136,11 +138,11 @@ const QuickShareForm = () => {
           .from('temporary_clips')
           .getPublicUrl(uniqueFileName);
 
-        // Create file record
+        // Create file record using the returned clip ID
         const { error: fileError } = await supabase
           .from('temporary_clip_files')
           .insert({
-            temporary_clip_id: clipData.id,
+            temporary_clip_id: clipId,
             file_name: file.name,
             file_url: publicUrl,
             file_size: file.size,
@@ -156,6 +158,7 @@ const QuickShareForm = () => {
       url: `${window.location.origin}/share/${code}`
     };
   };
+
   const mutation = useMutation({
     mutationFn: createTemporaryClip,
     onSuccess: data => {
@@ -166,6 +169,7 @@ const QuickShareForm = () => {
       toast.error(`Failed to share clip: ${error.message}`);
     }
   });
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!textContent && files.length === 0) {
@@ -181,12 +185,14 @@ const QuickShareForm = () => {
       files
     });
   };
+
   const handleCopy = () => {
     if (!sharedClip) return;
     navigator.clipboard.writeText(sharedClip.url);
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
   };
+
   if (sharedClip) {
     return <Card className="animate-fade-in">
             <CardHeader className="text-center">
@@ -217,6 +223,7 @@ const QuickShareForm = () => {
             </CardContent>
         </Card>;
   }
+
   return <Card>
         <CardHeader>
             <CardTitle className="text-xl">Try Quick Share Now</CardTitle>
@@ -247,4 +254,5 @@ const QuickShareForm = () => {
         </CardContent>
     </Card>;
 };
+
 export default QuickShareForm;
