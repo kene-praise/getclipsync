@@ -2,8 +2,20 @@ import UnifiedHeader from '@/components/UnifiedHeader';
 import Footer from '@/components/Footer';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { FileText, AlertTriangle, Shield, Users, Gavel } from 'lucide-react';
+import { Helmet } from 'react-helmet-async';
+
 const TermsPage = () => {
-  return <div className="min-h-screen bg-background">
+  return <>
+    <Helmet>
+      <title>Terms and Conditions | ClipSync - Service Agreement</title>
+      <meta name="description" content="ClipSync terms and conditions: User responsibilities, prohibited uses, data retention, and service agreement for our clipboard sync platform." />
+      <link rel="canonical" href="https://clipsync.app/terms" />
+      <meta property="og:title" content="Terms and Conditions | ClipSync" />
+      <meta property="og:description" content="Read ClipSync's terms of service and user agreement." />
+      <meta property="og:url" content="https://clipsync.app/terms" />
+    </Helmet>
+    
+    <div className="min-h-screen bg-background">
       <UnifiedHeader />
       <main className="container mx-auto px-4 py-12 max-w-4xl">
         <div className="space-y-8">
@@ -166,6 +178,8 @@ const TermsPage = () => {
         </div>
       </main>
       <Footer />
-    </div>;
+    </div>
+  </>;
 };
+
 export default TermsPage;

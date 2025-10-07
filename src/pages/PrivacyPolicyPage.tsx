@@ -2,8 +2,20 @@ import UnifiedHeader from '@/components/UnifiedHeader';
 import Footer from '@/components/Footer';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Shield, Eye, Database, Trash2, Download, Lock } from 'lucide-react';
+import { Helmet } from 'react-helmet-async';
+
 const PrivacyPolicyPage = () => {
-  return <div className="min-h-screen bg-background">
+  return <>
+    <Helmet>
+      <title>Privacy Policy | ClipSync - How We Protect Your Data</title>
+      <meta name="description" content="ClipSync privacy policy: Learn how we collect, use, and protect your clipboard data. End-to-end encryption, auto-deletion, and GDPR compliance." />
+      <link rel="canonical" href="https://clipsync.app/privacy" />
+      <meta property="og:title" content="Privacy Policy | ClipSync" />
+      <meta property="og:description" content="Learn how ClipSync protects your privacy with encryption, auto-deletion, and secure data handling." />
+      <meta property="og:url" content="https://clipsync.app/privacy" />
+    </Helmet>
+    
+    <div className="min-h-screen bg-background">
       <UnifiedHeader />
       <main className="container mx-auto px-4 py-12 max-w-4xl">
         <div className="space-y-8">
@@ -134,6 +146,8 @@ const PrivacyPolicyPage = () => {
         </div>
       </main>
       <Footer />
-    </div>;
+    </div>
+  </>;
 };
+
 export default PrivacyPolicyPage;

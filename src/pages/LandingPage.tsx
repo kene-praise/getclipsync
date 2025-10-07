@@ -1,4 +1,3 @@
-
 import UnifiedHeader from '@/components/UnifiedHeader';
 import Footer from '@/components/Footer';
 import BlueGlowBackground from '@/components/BlueGlowBackground';
@@ -8,6 +7,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Share2, Zap, Shield, Globe, Clock, Users } from 'lucide-react';
 import QuickShareTabs from '@/components/QuickShareTabs';
 import { useResponsive } from '@/hooks/useResponsive';
+import { Helmet } from 'react-helmet-async';
 
 const LandingPage = () => {
   const { isMobile, isTablet, isWeb } = useResponsive();
@@ -25,8 +25,52 @@ const LandingPage = () => {
   };
 
   return (
-    <div className={`min-h-screen bg-transparent ${getContainerPadding()}`}>
-      <UnifiedHeader />
+    <>
+      <Helmet>
+        <title>ClipSync - Transfer Text from Phone to PC | Sync Clipboard Between Devices</title>
+        <meta name="description" content="Transfer text from phone to PC instantly. Sync clipboard between Android, iPhone, Windows, Mac. Copy text from PC to phone. Free cross-device clipboard synchronization." />
+        <meta name="keywords" content="transfer text to PC, transfer text from phone to PC, sync clipboard, copy text from PC to phone, transfer text from Android to Mac, transfer text from iPhone to Windows laptop, clipboard sync, cross device clipboard, sync text between devices, share text between phone and computer, mobile to desktop transfer, phone to laptop text transfer, wireless clipboard, universal clipboard, multi device clipboard" />
+        <link rel="canonical" href="https://clipsync.app/" />
+        
+        {/* Open Graph */}
+        <meta property="og:type" content="website" />
+        <meta property="og:url" content="https://clipsync.app/" />
+        <meta property="og:title" content="ClipSync - Transfer Text from Phone to PC | Sync Clipboard Between Devices" />
+        <meta property="og:description" content="Transfer text from phone to PC instantly. Sync clipboard between Android, iPhone, Windows, Mac. Free cross-device clipboard synchronization." />
+        <meta property="og:image" content="https://lovable.dev/opengraph-image-p98pqg.png" />
+
+        {/* Twitter */}
+        <meta property="twitter:card" content="summary_large_image" />
+        <meta property="twitter:url" content="https://clipsync.app/" />
+        <meta property="twitter:title" content="ClipSync - Transfer Text from Phone to PC | Sync Clipboard Between Devices" />
+        <meta property="twitter:description" content="Transfer text from phone to PC instantly. Sync clipboard between Android, iPhone, Windows, Mac. Free cross-device clipboard synchronization." />
+        <meta property="twitter:image" content="https://lovable.dev/opengraph-image-p98pqg.png" />
+        
+        {/* Schema.org structured data */}
+        <script type="application/ld+json">
+          {JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "WebApplication",
+            "name": "ClipSync",
+            "description": "Transfer text from phone to PC instantly. Sync clipboard between Android, iPhone, Windows, Mac.",
+            "url": "https://clipsync.app",
+            "applicationCategory": "ProductivityApplication",
+            "operatingSystem": "Web Browser, Android, iOS, Windows, Mac",
+            "offers": {
+              "@type": "Offer",
+              "price": "0",
+              "priceCurrency": "USD"
+            },
+            "creator": {
+              "@type": "Organization",
+              "name": "ClipSync"
+            }
+          })}
+        </script>
+      </Helmet>
+      
+      <div className={`min-h-screen bg-transparent ${getContainerPadding()}`}>
+        <UnifiedHeader />
       
       <main className={`container mx-auto ${getMainPadding()}`}>
         {/* Hero Section */}
@@ -156,8 +200,9 @@ const LandingPage = () => {
         </section>
       </main>
       
-      <Footer />
-    </div>
+        <Footer />
+      </div>
+    </>
   );
 };
 

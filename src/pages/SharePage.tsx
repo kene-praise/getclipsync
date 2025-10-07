@@ -1,6 +1,7 @@
 import { useParams, Link } from 'react-router-dom';
 import SiteHeader from '@/components/SiteHeader';
 import Footer from '@/components/Footer';
+import { Helmet } from 'react-helmet-async';
 import {
   Card,
   CardContent,
@@ -137,8 +138,16 @@ const SharePage = () => {
   };
 
   return (
-    <div className="flex min-h-screen flex-col">
-      <SiteHeader />
+    <>
+      <Helmet>
+        <title>Shared Clip | ClipSync - View Shared Content</title>
+        <meta name="description" content="View shared content via ClipSync. Quick shares expire after 1 hour for your privacy and security." />
+        <link rel="canonical" href={`https://clipsync.app/share/${code}`} />
+        <meta name="robots" content="noindex, nofollow" />
+      </Helmet>
+      
+      <div className="flex min-h-screen flex-col">
+        <SiteHeader />
       <main className="flex-1">
         <div className="container flex h-full items-center justify-center py-8">
           {isLoading ? (
@@ -211,8 +220,9 @@ const SharePage = () => {
           )}
         </div>
       </main>
-      <Footer />
-    </div>
+        <Footer />
+      </div>
+    </>
   );
 };
 
